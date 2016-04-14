@@ -7,6 +7,9 @@
  
 # read json interface input file into string
 json=`python -mjson.tool $2`
+
+echo "$0 $1 $2 $3 $4" > /tmp/exportRun
+
  
 # export database to csv using json inputs and pass output into export file inside download directory
 
