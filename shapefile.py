@@ -38,6 +38,8 @@ import errno
 import imghdr
 import bz2
 import tarfile
+import codecs
+
 
 from collections import defaultdict
 import zipfile
@@ -183,18 +185,18 @@ moduleName = clean(jsondata['name'])
 fileNameType = "Identifier" #Original, Unchanged, Identifier
 
 images = None
-try:
-    foo= json.load(open(sys.argv[3],"r"))
-    # print foo["Export Images and Files?"]
-    if (foo["Export Images and Files?"] != []):
-        images = True
-    else:
-        images = False
-except:
-    sys.stderr.write("Json input failed")
-    images = True
+#try:
+#    foo= json.load(open(sys.argv[3],"r"))
+#    # print foo["Export Images and Files?"]
+#    if (foo["Export Images and Files?"] != []):
+#        images = True
+#    else:
+#        images = False
+#except:
+#    sys.stderr.write("Json input failed")
+#    images = True
 
-print "Exporting Images %s" % (images)
+#print "Exporting Images %s" % (images)
 
 def zipdir(path, zip):
     for root, dirs, files in os.walk(path):
@@ -306,7 +308,7 @@ for line in codecs.open(exportDir+'shape.out', 'r', encoding='utf-8').readlines(
 
 
 exportCon.commit()
-files = ['shape.sqlite3']
+files = [exportDir+'shape.sqlite3']
 
 
 
@@ -317,8 +319,26 @@ filehash = defaultdict(int)
 
 
 
+#print "* File list exported:"
+for directory in importCon.execute("select distinct aenttypename, attributename from latestnondeletedaentvalue join attributekey using (attributeid) join latestnondeletedarchent using (uuid) join aenttype using (aenttypeid) where attributeisfile is not null and measure is not null"):
+    makeSurePathExists("%s/%s/%s" % (exportDir,clean(directory[0]), clean(directory[1])))
+
+filehash = defaultdict(int)
+
+exportPhotos = []
+realExportList = {}
+
 print "* File list exported:"
-for filename in importCon.execute("select uuid, measure, freetext, certainty, attributename, aenttypename from latestnondeletedaentvalue join attributekey using (attributeid) join latestnondeletedarchent using (uuid) join aenttype using (aenttypeid) where attributeisfile is not null and measure is not null"):
+for filename in importCon.execute("""
+select uuid, measure, freetext, certainty, attributename, aenttypename, substr(measure,48) as sortname
+  from latestnondeletedaentvalue 
+  join attributekey using (attributeid) 
+  join latestnondeletedarchent using (uuid) 
+  join aenttype using (aenttypeid) 
+  join idealaent using (aenttypeid, attributeid) 
+ where attributeisfile is not null and measure is not null
+ order by sortname;                                  
+                                  """):
     try:        
         oldPath = filename[1].split("/")
         oldFilename = oldPath[2]
@@ -342,8 +362,8 @@ for filename in importCon.execute("select uuid, measure, freetext, certainty, at
                 if filename[2]:
                     delimiter = "a"
 
-                newFilename =  "%s/%s/%s_%s%s%s" % (aenttypename, attributename, identifier, filehash["%s%s" % (filename[0], attributename)],delimiter, r.group(0))
-                
+                newFilename =  "%s/%s/%s/%s_%s%s%s" % (aenttypename, attributename, identifier, identifier, filehash["%s%s" % (filename[0], attributename)],delimiter, r.group(0))
+                makeSurePathExists("%s/%s/%s/%s" % (exportDir, clean(directory[0]), clean(directory[1]), identifier))
 
 
             exifdata = exifCon.execute("select * from %s where uuid = %s" % (aenttypename, filename[0])).fetchone()
@@ -377,16 +397,34 @@ for filename in importCon.execute("select uuid, measure, freetext, certainty, at
                 
                 subprocess.call(["exiftool", "-m", "-q", "-sep", "\"; \"", "-overwrite_original", "-j=%s" % (exportDir+newFilename+".json"), exportDir+newFilename])
 
-
-            exportCon.execute("update %s set %s = ? where uuid = ?" % (aenttypename, attributename), (newFilename, filename[0]))
+            exportPhotos.append((clean(aenttypename), attributename, newFilename, filename[0]))
             print "    * %s" % (newFilename)
-            files.append(newFilename+".json")
-            files.append(newFilename)
+            files.append(exportDir+newFilename+".json")
+            files.append(exportDir+newFilename)
         else:
             print "<b>Unable to find file %s, from uuid: %s" % (originalDir+filename[1], filename[0]) 
     except:
             print "<b>Unable to find file (exception thrown) %s, from uuid: %s" % (originalDir+filename[1], filename[0])    
 
+
+exportAttributes = {}
+for aenttypename, attributename, newFilename, uuid in exportPhotos:
+    if aenttypename not in realExportList:
+        realExportList[aenttypename] = {}
+        exportAttributes[aenttypename] = attributename
+    if uuid not in realExportList[aenttypename]:
+        realExportList[aenttypename][uuid] = []
+
+    realExportList[aenttypename][uuid].append(newFilename)
+
+#print "    ",realExportList
+
+
+for aenttypename in realExportList:
+
+    for uuid in realExportList[aenttypename]:
+        exportCon.execute("update %s set %s = ? where uuid = ?" % (aenttypename, exportAttributes[aenttypename]), (', '.join(realExportList[aenttypename][uuid]), uuid))
+exportCon.commit()
 
 
 
@@ -398,9 +436,9 @@ for filename in importCon.execute("select uuid, measure, freetext, certainty, at
 
 for row in importCon.execute("select aenttypename, geometrytype(geometryn(geospatialcolumn,1)) as geomtype, count(distinct geometrytype(geometryn(geospatialcolumn,1))) from latestnondeletedarchent join aenttype using (aenttypeid) where geomtype is not null group by aenttypename having  count(distinct geometrytype(geometryn(geospatialcolumn,1))) = 1"):
     cmd = ["spatialite_tool", "-e", "-shp", "%s" % (clean(row[0]).decode("ascii")), "-d", "%sshape.sqlite3" % (exportDir), "-t", "%s" % (clean(row[0])), "-c", "utf-8", "-g", "geospatialcolumn", "-s", "%s" % (srid), "--type", "%s" % (row[1])]
-    files.append("%s.dbf" % (clean(row[0])))
-    files.append("%s.shp" % (clean(row[0])))
-    files.append("%s.shx" % (clean(row[0])))
+    files.append(exportDir+"%s.dbf" % (clean(row[0])))
+    files.append(exportDir+"%s.shp" % (clean(row[0])))
+    files.append(exportDir+"%s.shx" % (clean(row[0])))
     # print cmd
     subprocess.call(cmd, cwd=exportDir)
 
@@ -415,7 +453,7 @@ for at in importCon.execute("select aenttypename from aenttype"):
         cursor.execute("select * from %s" % (aenttypename))     
 
 
-    files.append("Entity-%s.csv" % (aenttypename))
+    files.append(exportDir+"Entity-%s.csv" % (aenttypename))
 
     csv_writer = UnicodeWriter(open(exportDir+"Entity-%s.csv" % (aenttypename), "wb+"))
     csv_writer.writerow([i[0] for i in cursor.description]) # write headers
@@ -450,21 +488,94 @@ for relntypeid, relntypename in relntypecursor.execute(relntypequery):
     csv_writer.writerows(relncursor)
 
 
+for aenttypeid, aenttypename in importCon.execute("select aenttypeid, aenttypename from aenttype"): 
+    aenttypename = clean(aenttypename)
+    attributes = [u'identifier', u'createdBy', u'createdAtGMT', u'modifiedBy', u'modifiedAtGMT', 'uuid']
 
-for at in importCon.execute("select aenttypename from aenttype"):
-    aenttypename = "%s" % (clean(at[0]))
 
-    cursor = exportCon.cursor()
+    cursor = exifCon.cursor()
+    attrHeader = [u'Identifier', u'Created By', u'Created At (GMT)', u'Modified By', u'Modified At (GMT)', 'uuid']
+    for attr in importCon.execute(u"select distinct attributename from attributekey join idealaent using (attributeid) where aenttypeid = ? group by attributename order by aentcountorder", [aenttypeid]):
 
-    for line in cursor.execute("select * from %s" % (aenttypename))     
-        print line
+        attrToInsert = clean(attr[0])
+        if attrToInsert not in attributes:
+            attributes.append(attrToInsert)
+            attrHeader.append(attr[0])
 
+
+    #print "select %s from %s" % (', '.join(attributes), aenttypename)
+    
+    for line in cursor.execute("select %s from %s" % (', '.join(attributes).encode('utf-8'), aenttypename)):
+
+
+
+
+        metadata = """InfoBegin
+InfoKey: ModDate    
+InfoValue: %s
+InfoBegin
+InfoKey: Subject
+InfoValue: %s
+InfoBegin
+InfoKey: CreationDate
+InfoValue: %s
+InfoBegin
+InfoKey: Author
+InfoValue: File Reference %s, Garrison %s at Repository %s
+InfoBegin
+InfoKey: Keywords
+InfoValue: %s, %s
+InfoBegin
+InfoKey: Title
+InfoValue: %s
+InfoBegin
+InfoKey: Creator
+InfoValue: %s
+InfoBegin
+InfoKey: Trapped
+InfoValue: /False
+InfoBegin
+InfoKey: Producer
+InfoValue: Made by FAIMS Mobile and the exporter at https://github.com/FAIMS/scanExporter""" % (line['modifiedAtGMT'], line['Theme'], line['createdAtGMT'], line['FileReference'], line['Garrison'], line['Repository'], line['Theme'], line['SubTheme'],line['DocName'],line['createdBy'])
+
+        meta = codecs.open("%s/%s.info"% (exportDir,clean(line['ID'])), "w", "utf-8")  
+        meta.write(metadata)
+        meta.close()
+
+        f = codecs.open("%s/%s.md" % (exportDir,clean(line['ID'])), "w", "utf-8")  
+        photofiles =""
+
+
+        for num,key in enumerate(attrHeader):
+        
+            if key == "Identifier":
+                prefix = u"# "
+            else:
+                prefix = u"* "
+            if key != "uuid":
+                writeline = u"%s%s: %s\n" % (prefix, key, line[attributes[num]])
+            else:
+                uuid=line[attributes[num]]            
+            f.write(writeline)
+            if key == "Identifier":
+                f.write("\n")
+
+
+        f.close()
+        
+        
+        print subprocess.check_output(["bash", "./stitchPDF.sh", originalDir, exportDir, clean(line['ID'])])
+
+
+
+files = files + glob.glob("%s/pdf/*/*" % (exportDir))
 
 
 tarf = tarfile.open("%s/%s-export.tar.bz2" % (finalExportDir,moduleName), 'w:bz2')
 try:
     for file in files:
-        tarf.add(exportDir+file, arcname=moduleName+'/'+file)
+        tarf.add(file, arcname=moduleName+'/'+file.replace('//','/').replace(exportDir,''))
+        
 finally:
     tarf.close()
 
