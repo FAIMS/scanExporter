@@ -220,10 +220,10 @@ except OSError:
 
 importCon = sqlite3.connect(importDB)
 importCon.enable_load_extension(True)
-importCon.load_extension("libspatialite.so.5")
+importCon.load_extension(LIBSPATIALITE)
 exportCon = sqlite3.connect(exportDB)
 exportCon.enable_load_extension(True)
-exportCon.load_extension("libspatialite.so.5")
+exportCon.load_extension(LIBSPATIALITE)
 
 
 exportCon.execute("select initSpatialMetaData(1)")
@@ -238,7 +238,7 @@ for line in importCon.iterdump():
 exifCon = sqlite3.connect(exportDB)
 exifCon.row_factory = dict_factory
 exportCon.enable_load_extension(True)
-exportCon.load_extension("libspatialite.so.5")
+exportCon.load_extension(LIBSPATIALITE)
 
 
   
