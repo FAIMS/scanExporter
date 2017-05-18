@@ -91,10 +91,11 @@ mkdir -p stage2
 
 for file in $(find . -name "*.txt" | sort -g); do
     cat $file  >> "stage2/${3}_ENG.txt"
+    rm $file
 done
 
 
-pdfunite `find . -name "*.pdf"| sort -V` "stage2/${3}_OCR.pdf"
+pdfunite `find . -name "*.pdf"| sort -V` "stage2/${3}_preOCR.pdf"
 rm *.pdf
 #convert `find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V` -page a4 "stage2/${3}.pdf"
 
@@ -112,37 +113,37 @@ for file in  $(find "jpg2pdf/" -name "*.tiff" | sort -V); do
         tiffcp -a $file jpg2pdf/multi.tiff 2> /dev/null 
 done
 
-tiff2pdf -p A4 -F -j -q 90 -f -o "stage2/${3}_original.pdf" jpg2pdf/multi.tiff 
+tiff2pdf -p A4 -F -j -q 90 -f -o "stage2/${3}_preoriginal.pdf" jpg2pdf/multi.tiff 
 
 
 
 rm -rf jpg2pdf
 
-mv stage2/* .
+#mv stage2/* .
 
 
-#cp ../../$3.md stage2/
-#cp ../../$3.info stage2/
-#cd stage2
-#echo $?
-#pandoc -i $3.md -t ConTeXt -s -o "${3}cover.tex"
-#sed -i 's/\[letter\]/\[A4\]/g' "${3}cover.tex"
-#echo $?
-#context "${3}cover.tex" --purgeall --quiet --batchmode > /dev/null
-#echo $?
-#pdfunite "${3}cover.pdf" "${3}.pdf" "${3}full.pdf"
-#pdfunite "${3}cover.pdf" "${3}OCR.pdf" "${3}OCRfull.pdf"
-#pdftk "${3}full.pdf" dump_data > "${3}prefull".info 2>/dev/null
-#pdftk "${3}OCRfull.pdf" dump_data > "${3}preOCRfull".info 2>/dev/null
-#sed -i '/^Info/d' "${3}prefull.info"
-#sed -i '/^Info/d' "${3}preOCRfull.info"
-#cat "$3.info" "${3}prefull.info" > "${3}full.info"
-#cat "$3.info" "${3}preOCRfull.info" > "${3}OCRfull.info"
+cp ../../$3.md stage2/
+cp ../../$3.info stage2/
+cd stage2
+echo $?
+pandoc -i $3.md -t ConTeXt -s -o "${3}cover.tex"
+sed -i 's/\[letter\]/\[A4\]/g' "${3}cover.tex"
+echo $?
+context "${3}cover.tex" --purgeall --quiet --batchmode > /dev/null
+echo $?
+pdfunite "${3}cover.pdf" "${3}_preoriginal.pdf" "${3}_original.pdf"
+pdfunite "${3}cover.pdf" "${3}_preOCR.pdf" "${3}_OCR.pdf"
+pdftk "${3}_original.pdf" dump_data > "${3}prefull".info 2>/dev/null
+pdftk "${3}_OCR.pdf" dump_data > "${3}preOCRfull".info 2>/dev/null
+sed -i '/^Info/d' "${3}prefull.info"
+sed -i '/^Info/d' "${3}preOCRfull.info"
+cat "$3.info" "${3}prefull.info" > "${3}full.info"
+cat "$3.info" "${3}preOCRfull.info" > "${3}OCRfull.info"
 
-#cd ..
+cd ..
 
-#pdftk "stage2/${3}full.pdf" update_info_utf8 "stage2/$3full.info" output "$3.pdf" 2>/dev/null
-#pdftk "stage2/${3}OCRfull.pdf" update_info_utf8 "stage2/$3OCRfull.info" output "$3OCR.pdf" 2>/dev/null
+pdftk "stage2/${3}_original.pdf" update_info_utf8 "stage2/$3full.info" output "$3_original.pdf" 2>/dev/null
+pdftk "stage2/${3}_OCR.pdf" update_info_utf8 "stage2/$3OCRfull.info" output "$3_OCR.pdf" 2>/dev/null
 
 rm -rf stage2
 exit 0
