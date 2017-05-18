@@ -53,6 +53,15 @@ modes = { zipfile.ZIP_DEFLATED: 'deflated',
           zipfile.ZIP_STORED:   'stored',
           }
 
+
+
+if lsb_release.get_lsb_information()['RELEASE'] == '16.04':
+    LIBSPATIALITE = 'mod_spatialite.so'
+else:
+    LIBSPATIALITE = 'libspatialite.so.5'
+
+
+
 print sys.argv
 
 class UTF8Recoder:
@@ -108,7 +117,7 @@ class UnicodeWriter:
         if isinstance(obj, buffer):         
             bufferCon = sqlite3.connect(':memory:')
             bufferCon.enable_load_extension(True)
-            bufferCon.load_extension("libspatialite.so.5")
+            bufferCon.load_extension(LIBSPATIALITE)
             foo = bufferCon.execute("select astext(?);", ([obj])).fetchone()            
             return foo[0]
         if obj == None:
