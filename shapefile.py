@@ -573,7 +573,7 @@ InfoValue: Made by FAIMS Mobile and the exporter at https://github.com/FAIMS/sca
         f.close()
         
         
-        print subprocess.check_output(["bash", "./stitchPDF.sh", originalDir, exportDir, clean(line['ID'])])
+        print subprocess.check_output(["bash", "./stitchPDF.sh", originalDir, exportDir, clean(line['ID'])], stderr=subprocess.STDOUT)
 
 
 
