@@ -545,7 +545,7 @@ InfoKey: Trapped
 InfoValue: /False
 InfoBegin
 InfoKey: Producer
-InfoValue: Made by FAIMS Mobile and the exporter at https://github.com/FAIMS/scanExporter""" % (line['modifiedAtGMT'], "wibble", line['createdAtGMT'], line['FileReference'], line['Garrison'], line['Repository'], line['Theme'], line['SubTheme'],line['DocName'],line['createdBy'])
+InfoValue: Made by FAIMS Mobile and the exporter at https://github.com/FAIMS/scanExporter""" % (line['modifiedAtGMT'], "wibble", line['createdAtGMT'], line['FileReference'], line['Garrison'], line['Repository'], "wobble", "foo",line['DocName'],line['createdBy'])
 
         meta = codecs.open("%s/%s.info"% (exportDir,clean(line['ID'])), "w", "utf-8")  
         meta.write(metadata)
