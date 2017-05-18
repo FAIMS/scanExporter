@@ -16,9 +16,7 @@ echo "$0 $1 $2 $3 $4" > /tmp/exportRun
 echo -e "\nTiming data:\n\nExport Started: $(date)" > $4
 python shapefile.py $1 $3 $2 > /tmp/bar 2> /tmp/foo
 echo -e "\nExport Finished: $(date)\n" >> $4
-sed -i 's/^/    /' /tmp/timing
 
-cat /tmp/timing >> $4
 
 echo -e "\n\n\n**Your data have been prepared for export.**
 
