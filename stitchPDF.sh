@@ -133,30 +133,33 @@ sed -i 's/\[letter\]/\[A4\]/g' "${3}cover.tex"
 echo $?
 context "${3}cover.tex" --purgeall --quiet --batchmode > /dev/null
 echo $?
-pdfunite "${3}cover.pdf" "${3}_preoriginal.pdf" "${3}_originalfull.pdf"
-pdfunite "${3}cover.pdf" "${3}_preOCR.pdf" "${3}_OCRfull.pdf"
-pdftk "${3}_originalfull.pdf" dump_data > "${3}prefull".info 2>/dev/null
-pdftk "${3}_OCRfull.pdf" dump_data > "${3}preOCRfull".info 2>/dev/null
-cat "${3}prefull.info"
-sed -i '/^Info/d' "${3}prefull.info"
-sed -i '/^Info/d' "${3}preOCRfull.info"
-cat "$3.info" "${3}prefull.info" > "${3}full.info"
-cat "$3.info" "${3}preOCRfull.info" > "${3}OCRfull.info"
-
+pdfunite "${3}cover.pdf" "${3}_preoriginal.pdf" "../${3}_original.pdf"
+pdfunite "${3}cover.pdf" "${3}_preOCR.pdf" "../${3}_OCR.pdf"
 cd ..
-
-echo "eng"
 cat stage2/$3.md "stage2/${3}_ENG.txt" > "${3}_ENG.txt"
-echo $?
 
-echo "orig"
-cat "stage2/${3}full.info"
-pdftk "stage2/${3}_originalfull.pdf" update_info_utf8 "stage2/${3}full.info" output "$3_original.pdf" 
-echo $?
-
-echo "ocr"
-pdftk "stage2/${3}_OCRfull.pdf" update_info_utf8 "stage2/${3}OCRfull.info" output "$3_OCR.pdf" 
-echo $?
+# pdftk "${3}_originalfull.pdf" dump_data > "${3}prefull".info 2>/dev/null
+# pdftk "${3}_OCRfull.pdf" dump_data > "${3}preOCRfull".info 2>/dev/null
+# cat "${3}prefull.info"
+# sed -i '/^Info/d' "${3}prefull.info"
+# sed -i '/^Info/d' "${3}preOCRfull.info"
+# cat "$3.info" "${3}prefull.info" > "${3}full.info"
+# cat "$3.info" "${3}preOCRfull.info" > "${3}OCRfull.info"
+# 
+# cd ..
+# 
+# echo "eng"
+# cat stage2/$3.md "stage2/${3}_ENG.txt" > "${3}_ENG.txt"
+# echo $?
+# 
+# echo "orig"
+# cat "stage2/${3}full.info"
+# pdftk "stage2/${3}_originalfull.pdf" update_info_utf8 "stage2/${3}full.info" output "$3_original.pdf" 
+# echo $?
+# 
+# echo "ocr"
+# pdftk "stage2/${3}_OCRfull.pdf" update_info_utf8 "stage2/${3}OCRfull.info" output "$3_OCR.pdf" 
+# echo $?
 
 rm -rf stage2
 exit 0
