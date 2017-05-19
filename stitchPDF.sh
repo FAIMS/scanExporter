@@ -139,7 +139,7 @@ sed -i '/^Info/d' "${3}prefull.info"
 sed -i '/^Info/d' "${3}preOCRfull.info"
 cat "$3.info" "${3}prefull.info" > "${3}full.info"
 cat "$3.info" "${3}preOCRfull.info" > "${3}OCRfull.info"
-echo $?
+cat ${3}OCRfull.info
 cd ..
 
 cat stage2/$3.md "stage2/${3}_ENG.txt" > "${3}_ENG.txt"
