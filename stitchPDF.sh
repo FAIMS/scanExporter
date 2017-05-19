@@ -142,7 +142,7 @@ cat "$3.info" "${3}preOCRfull.info" > "${3}OCRfull.info"
 echo $?
 cd ..
 
-cat $3.md "stage2/${3}_ENG.txt" > "${3}_ENG.txt"
+cat stage2/$3.md "stage2/${3}_ENG.txt" > "${3}_ENG.txt"
 pdftk "stage2/${3}_original.pdf" update_info_utf8 "stage2/${3}full.info" output "$3_original.pdf" 
 pdftk "stage2/${3}_OCR.pdf" update_info_utf8 "stage2/${3}OCRfull.info" output "$3_OCR.pdf" 
 
