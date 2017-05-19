@@ -406,8 +406,8 @@ select uuid, measure, freetext, certainty, attributename, aenttypename, substr(m
                 
                 subprocess.call(["exiftool", "-m", "-q", "-sep", "\"; \"", "-overwrite_original", "-j=%s" % (exportDir+newFilename+".json"), exportDir+newFilename])
 
-            exportPhotos.append((clean(aenttypename), attributename, newFilename, filename[0]))
-            print "    * %s" % (newFilename)
+            #exportPhotos.append((clean(aenttypename), attributename, newFilename, filename[0]))
+            #print "    * %s" % (newFilename)
             #files.append(exportDir+newFilename+".json")
             #files.append(exportDir+newFilename)
         else:
@@ -424,9 +424,9 @@ for aenttypename, attributename, newFilename, uuid in exportPhotos:
     if uuid not in realExportList[aenttypename]:
         realExportList[aenttypename][uuid] = []
 
-    realExportList[aenttypename][uuid].append(newFilename)
+    #realExportList[aenttypename][uuid].append(newFilename)
 
-print "    ",realExportList
+#print "    ",realExportList
 
 
 for aenttypename in realExportList:
@@ -487,7 +487,7 @@ relntypecursor = importCon.cursor()
 relncursor = importCon.cursor()
 for relntypeid, relntypename in relntypecursor.execute(relntypequery): 
     relncursor.execute(relnquery, [relntypename])
-    #print relntypename
+    #print relntypenaprintme
 
     exportCon.execute("CREATE TABLE %s (parentuuid TEXT, childuuid TEXT, participatesverb TEXT);" % (clean(relntypename)))
     for i in relncursor:
