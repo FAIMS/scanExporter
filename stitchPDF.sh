@@ -145,7 +145,7 @@ cat "$3.info" "${3}prefull.info" > "${3}full.info"
 
 cat "${3}full.info"
 echo "***"
-pdftk "${3}_originalfull.pdf" update_info_utf8 "${3}full.info" output "../$3_original.pdf" 
+pdftk "${3}_originalfull.pdf" update_info_utf8 "${3}.info" output "../$3_original.pdf" 
 
 
 # pdftk "${3}_OCRfull.pdf" dump_data > "${3}preOCRfull".info 2>/dev/null
