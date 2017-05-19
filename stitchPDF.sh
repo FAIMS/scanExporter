@@ -143,7 +143,7 @@ pdftk "${3}_originalfull.pdf" dump_data_utf8 output "${3}prefull".info 2>/dev/nu
 sed -i '/^Info/d' "${3}prefull.info"
 cat "$3.info" "${3}prefull.info" > "${3}full.info"
 
-cat "${3}full.info"
+cat "${3}.info"
 echo "***"
 pdftk "${3}_originalfull.pdf" update_info_utf8 "${3}.info" output "../$3_original.pdf" 
 

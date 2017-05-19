@@ -520,10 +520,9 @@ for aenttypeid, aenttypename in importCon.execute("select aenttypeid, aenttypena
 
 
         metadata = """
-InfoKey: ModDate    
-InfoValue: %s
-
-""" % (line['modifiedAtGMT'], "wibble", line['createdAtGMT'], line['FileReference'], line['Garrison'], line['Repository'], "wobble", "foo",line['DocName'],line['createdBy'])
+InfoKey: Subject
+InfoValue: wibble
+""" 
 
         meta = codecs.open("%s/%s.info"% (exportDir,clean(line['ID'])), "w", "utf-8")  
         meta.write(metadata)
