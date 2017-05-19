@@ -323,17 +323,17 @@ files = [exportDir+'shape.sqlite3']
 
 for directory in importCon.execute("select distinct aenttypename, attributename from latestnondeletedaentvalue join attributekey using (attributeid) join latestnondeletedarchent using (uuid) join aenttype using (aenttypeid) where attributeisfile is not null and measure is not null"):
    makeSurePathExists("%s/%s/%s" % (exportDir,clean(directory[0]), clean(directory[1])))
-# 
+ 
 filehash = defaultdict(int)
-# 
-# 
-# 
+ 
+ 
+ 
 print "* File list exported:"
 for directory in importCon.execute("select distinct aenttypename, attributename from latestnondeletedaentvalue join attributekey using (attributeid) join latestnondeletedarchent using (uuid) join aenttype using (aenttypeid) where attributeisfile is not null and measure is not null"):
    makeSurePathExists("%s/%s/%s" % (exportDir,clean(directory[0]), clean(directory[1])))
-# 
+ 
 filehash = defaultdict(int)
-# 
+ 
 exportPhotos = []
 realExportList = {}
 
