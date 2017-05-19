@@ -519,33 +519,10 @@ for aenttypeid, aenttypename in importCon.execute("select aenttypeid, aenttypena
 
 
 
-        metadata = """InfoBegin
+        metadata = """
 InfoKey: ModDate    
 InfoValue: %s
-InfoBegin
-InfoKey: Subject
-InfoValue: %s
-InfoBegin
-InfoKey: CreationDate
-InfoValue: %s
-InfoBegin
-InfoKey: Author
-InfoValue: File Reference %s, Garrison %s at Repository %s
-InfoBegin
-InfoKey: Keywords
-InfoValue: %s, %s
-InfoBegin
-InfoKey: Title
-InfoValue: %s
-InfoBegin
-InfoKey: Creator
-InfoValue: %s
-InfoBegin
-InfoKey: Trapped
-InfoValue: /False
-InfoBegin
-InfoKey: Producer
-InfoValue: Made by FAIMS Mobile and the exporter at https://github.com/FAIMS/scanExporter
+
 """ % (line['modifiedAtGMT'], "wibble", line['createdAtGMT'], line['FileReference'], line['Garrison'], line['Repository'], "wobble", "foo",line['DocName'],line['createdBy'])
 
         meta = codecs.open("%s/%s.info"% (exportDir,clean(line['ID'])), "w", "utf-8")  
