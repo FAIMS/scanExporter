@@ -102,7 +102,7 @@ rm *.pdf
 mkdir jpg2pdf
 
 
-parallel 'convert "{}" -compress lzw -auto-orient "jpg2pdf{/.}.tiff' ::: $(find "../../ScanRecord/Files/$3" -name "*.jpg")
+parallel 'convert "{}" -compress lzw -auto-orient "jpg2pdf{/.}.tiff"' ::: $(find "../../ScanRecord/Files/$3" -name "*.jpg")
 
 #for file in $(find "../../ScanRecord/Files/$3" -name "*.jpg" | sort -V  ); do
 #        outfile="jpg2pdf/$(basename -s ".jpg" $file).tiff"
