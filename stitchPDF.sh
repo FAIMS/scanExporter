@@ -150,7 +150,7 @@ echo $?
 
 echo "orig"
 cat "stage2/${3}full.info"
-pdftk "stage2/${3}_originalfull.pdf" update_info_utf8 "stage2/${3}prefull.info" output "$3_original.pdf" 
+pdftk "stage2/${3}_originalfull.pdf" update_info_utf8 "stage2/${3}full.info" output "$3_original.pdf" 
 echo $?
 
 echo "ocr"
