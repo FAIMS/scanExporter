@@ -147,6 +147,7 @@ cat stage2/$3.md "stage2/${3}_ENG.txt" > "${3}_ENG.txt"
 echo $?
 
 echo "orig"
+cat "stage2/${3}full.info"
 pdftk "stage2/${3}_originalfull.pdf" update_info_utf8 "stage2/${3}full.info" output "$3_original.pdf" 
 echo $?
 
