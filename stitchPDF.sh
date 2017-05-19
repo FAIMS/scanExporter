@@ -137,6 +137,7 @@ pdfunite "${3}cover.pdf" "${3}_preoriginal.pdf" "${3}_originalfull.pdf"
 pdfunite "${3}cover.pdf" "${3}_preOCR.pdf" "${3}_OCRfull.pdf"
 pdftk "${3}_originalfull.pdf" dump_data > "${3}prefull".info 2>/dev/null
 pdftk "${3}_OCRfull.pdf" dump_data > "${3}preOCRfull".info 2>/dev/null
+cat "${3}prefull.info"
 sed -i '/^Info/d' "${3}prefull.info"
 sed -i '/^Info/d' "${3}preOCRfull.info"
 cat "$3.info" "${3}prefull.info" > "${3}full.info"
