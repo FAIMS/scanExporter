@@ -20,7 +20,7 @@ find ../../ScanRecord/Files/$3 -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BE
 
 parallel --no-notice "scantailor-cli --despeckle=normal --normalize-illumination --color-mode=black_and_white --dewarping=auto {} ./ ; rm {}" ::: $(find . -name "*.pnm" | sort -V)
 rm -rf cache
-parallel --no-notice --jobs 8 "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unpaper+tiff2pdf+pdftk+imagemagick+tesseract+exactimage' {} ; rm {}" ::: $(find . -name "*.tif")
+parallel --no-notice "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unpaper+tiff2pdf+pdftk+imagemagick+tesseract+exactimage' {} ; rm {}" ::: $(find . -name "*.tif")
 
 
 
@@ -59,7 +59,7 @@ pdftk {.}.bk2 update_info {.}.info output {} 2< /dev/null;
 rm -f {.}.bak {.}.bk2 {.}.info {.}.png {.}.jpg {}.hocr;
 HereDoc
 )
-parallel --jobs 8 "$pdf14" ::: $(find . -name "*.pdf") 
+parallel "$pdf14" ::: $(find . -name "*.pdf") 
 
 #echo "pdf 1.4"
 # for file in $(find . -name "*.pdf" | sort -V); do
@@ -101,15 +101,15 @@ rm *.pdf
 
 mkdir jpg2pdf
 
-for file in $(find "../../ScanRecord/Files/$3" -name "*.jpg" | sort -V  ); do
 
-        echo -n "."
-        outfile="jpg2pdf/$(basename -s ".jpg" $file).tiff"
-        convert "$file" -compress lzw -auto-orient "$outfile"
-done
+parallel 'convert "{}" -compress lzw -auto-orient "jpg2pdf{/.}.tiff' ::: $(find "../../ScanRecord/Files/$3" -name "*.jpg")
+
+#for file in $(find "../../ScanRecord/Files/$3" -name "*.jpg" | sort -V  ); do
+#        outfile="jpg2pdf/$(basename -s ".jpg" $file).tiff"
+#        convert "$file" -compress lzw -auto-orient "$outfile"
+#done
 
 for file in  $(find "jpg2pdf/" -name "*.tiff" | sort -V); do
-        echo -n "."
         tiffcp -a $file jpg2pdf/multi.tiff 2> /dev/null 
 done
 
@@ -139,7 +139,7 @@ sed -i '/^Info/d' "${3}prefull.info"
 sed -i '/^Info/d' "${3}preOCRfull.info"
 cat "$3.info" "${3}prefull.info" > "${3}full.info"
 cat "$3.info" "${3}preOCRfull.info" > "${3}OCRfull.info"
-
+echo $?
 cd ..
 
 pdftk "stage2/${3}_original.pdf" update_info_utf8 "stage2/$3full.info" output "$3_original.pdf" 2>/dev/null
