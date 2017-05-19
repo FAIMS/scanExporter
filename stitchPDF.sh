@@ -116,6 +116,7 @@ done
 tiff2pdf -p A4 -F -j -q 90 -f -o "stage2/${3}_preoriginal.pdf" jpg2pdf/multi.tiff 
 
 
+ls stage2/*
 
 rm -rf jpg2pdf
 
@@ -148,7 +149,7 @@ echo $?
 
 echo "orig"
 cat "stage2/${3}full.info"
-pdftk "stage2/${3}_originalfull.pdf" update_info_utf8 "stage2/${3}full.info" output "$3_original.pdf" 
+pdftk "stage2/${3}_originalfull.pdf" update_info_utf8 "stage2/${3}prefull.info" output "$3_original.pdf" 
 echo $?
 
 echo "ocr"
