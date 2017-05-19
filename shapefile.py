@@ -552,7 +552,7 @@ InfoValue: wibble
         try:
             output= subprocess.check_output(["bash", "./stitchPDF.sh", originalDir, exportDir, clean(line['ID'])], stderr=subprocess.STDOUT)
             print output
-        except CalledProcessError as e:
+        except Exception as e:
             print e, e.output
 
 
