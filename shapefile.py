@@ -356,7 +356,7 @@ files = [exportDir+'shape.sqlite3']
         # newFilename = "%s/%s/%s" % (aenttypename, attributename, oldFilename)
         # if os.path.isfile(originalDir+filename[1]):
             # if (fileNameType == "Identifier"):
-                print filename[0]
+#                print filename[0]
                 # 
                 # filehash["%s%s" % (filename[0], attributename)] += 1
                 # 
