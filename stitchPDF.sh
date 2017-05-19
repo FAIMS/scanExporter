@@ -102,7 +102,7 @@ rm *.pdf
 mkdir jpg2pdf
 
 
-parallel 'echo {}; echo jpg2pdf{/.}.tiff; convert {} -compress lzw -auto-orient jpg2pdf/{/.}.tiff' ::: $(find ../../ScanRecord/Files/$3 -name "*.jpg")
+parallel 'echo {}; echo jpg2pdf/{/.}.tiff; convert {} -compress lzw -auto-orient jpg2pdf/{/.}.tiff' ::: $(find ../../ScanRecord/Files/$3 -name "*.jpg")
 
 #for file in $(find "../../ScanRecord/Files/$3" -name "*.jpg" | sort -V  ); do
 #        outfile="jpg2pdf/$(basename -s ".jpg" $file).tiff"
@@ -133,7 +133,7 @@ sed -i 's/\[letter\]/\[A4\]/g' "${3}cover.tex"
 context "${3}cover.tex" --purgeall --quiet --batchmode > /dev/null
 
 pdfunite "${3}cover.pdf" "${3}_preoriginal.pdf" "${3}_originalfull.pdf"
-pdfunite "${3}cover.pdf" _i"${3}_preOCR.pdf" "../${3}_OCR.pdf"
+pdfunite "${3}cover.pdf" "${3}_preOCR.pdf" "../${3}_OCR.pdf"
 
 
 pdftk "${3}_originalfull.pdf" dump_data output "${3}prefull".info 2>/dev/null
