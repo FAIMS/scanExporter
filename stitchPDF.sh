@@ -174,4 +174,6 @@ cd ..
 cat stage2/$3.md "stage2/${3}_ENG.txt" > "${3}_ENG.txt"
 
 rm -rf stage2
+ls *
+
 exit 0

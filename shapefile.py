@@ -328,7 +328,7 @@ filehash = defaultdict(int)
  
  
  
-print "* File list exported:"
+
 for directory in importCon.execute("select distinct aenttypename, attributename from latestnondeletedaentvalue join attributekey using (attributeid) join latestnondeletedarchent using (uuid) join aenttype using (aenttypeid) where attributeisfile is not null and measure is not null"):
    makeSurePathExists("%s/%s/%s" % (exportDir,clean(directory[0]), clean(directory[1])))
  
@@ -337,7 +337,7 @@ filehash = defaultdict(int)
 exportPhotos = []
 realExportList = {}
 
-print "* File list exported:"
+#print "* UUIDs exported:"
 for filename in importCon.execute("""
 select uuid, measure, freetext, certainty, attributename, aenttypename, substr(measure,48) as sortname
   from latestnondeletedaentvalue 
@@ -356,7 +356,7 @@ select uuid, measure, freetext, certainty, attributename, aenttypename, substr(m
         newFilename = "%s/%s/%s" % (aenttypename, attributename, oldFilename)
         if os.path.isfile(originalDir+filename[1]):
             if (fileNameType == "Identifier"):
-                print filename[0]
+                #print filename[0], 
                 
                 filehash["%s%s" % (filename[0], attributename)] += 1
                 
