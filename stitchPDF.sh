@@ -142,8 +142,11 @@ cat "$3.info" "${3}preOCRfull.info" > "${3}OCRfull.info"
 echo $?
 cd ..
 
-pdftk "stage2/${3}_original.pdf" update_info_utf8 "stage2/$3full.info" output "$3_original.pdf" 2>/dev/null
-pdftk "stage2/${3}_OCR.pdf" update_info_utf8 "stage2/$3OCRfull.info" output "$3_OCR.pdf" 2>/dev/null
+rm -rf stage2
+
+cat $3.md "stage2/${3}_ENG.txt" > "${3}_ENG.txt"
+pdftk "stage2/${3}_original.pdf" update_info_utf8 "stage2/${3}full.info" output "$3_original.pdf" 
+pdftk "stage2/${3}_OCR.pdf" update_info_utf8 "stage2/${3}OCRfull.info" output "$3_OCR.pdf" 
 
 rm -rf stage2
 exit 0
