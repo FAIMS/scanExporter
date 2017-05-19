@@ -321,120 +321,120 @@ files = [exportDir+'shape.sqlite3']
 
 
 
-for directory in importCon.execute("select distinct aenttypename, attributename from latestnondeletedaentvalue join attributekey using (attributeid) join latestnondeletedarchent using (uuid) join aenttype using (aenttypeid) where attributeisfile is not null and measure is not null"):
-    makeSurePathExists("%s/%s/%s" % (exportDir,clean(directory[0]), clean(directory[1])))
+#for directory in importCon.execute("select distinct aenttypename, attributename from latestnondeletedaentvalue join attributekey using (attributeid) join latestnondeletedarchent using (uuid) join aenttype using (aenttypeid) where attributeisfile is not null and measure is not null"):
+#    makeSurePathExists("%s/%s/%s" % (exportDir,clean(directory[0]), clean(directory[1])))
 
-filehash = defaultdict(int)
+#filehash = defaultdict(int)
 
 
 
 #print "* File list exported:"
-for directory in importCon.execute("select distinct aenttypename, attributename from latestnondeletedaentvalue join attributekey using (attributeid) join latestnondeletedarchent using (uuid) join aenttype using (aenttypeid) where attributeisfile is not null and measure is not null"):
-    makeSurePathExists("%s/%s/%s" % (exportDir,clean(directory[0]), clean(directory[1])))
+#for directory in importCon.execute("select distinct aenttypename, attributename from latestnondeletedaentvalue join attributekey using (attributeid) join latestnondeletedarchent using (uuid) join aenttype using (aenttypeid) where attributeisfile is not null and measure is not null"):
+#    makeSurePathExists("%s/%s/%s" % (exportDir,clean(directory[0]), clean(directory[1])))
 
-filehash = defaultdict(int)
+#filehash = defaultdict(int)
 
-exportPhotos = []
-realExportList = {}
-
-print "* File list exported:"
-for filename in importCon.execute("""
-select uuid, measure, freetext, certainty, attributename, aenttypename, substr(measure,48) as sortname
-  from latestnondeletedaentvalue 
-  join attributekey using (attributeid) 
-  join latestnondeletedarchent using (uuid) 
-  join aenttype using (aenttypeid) 
-  join idealaent using (aenttypeid, attributeid) 
- where attributeisfile is not null and measure is not null
- order by sortname;                                  
-                                  """):
-    try:        
-        oldPath = filename[1].split("/")
-        oldFilename = oldPath[2]
-        aenttypename = clean(filename[5])
-        attributename = clean(filename[4])
-        newFilename = "%s/%s/%s" % (aenttypename, attributename, oldFilename)
-        if os.path.isfile(originalDir+filename[1]):
-            if (fileNameType == "Identifier"):
-                # print filename[0]
-                
-                filehash["%s%s" % (filename[0], attributename)] += 1
-                
-
-                foo = exportCon.execute("select identifier from %s where uuid = %s" % (aenttypename, filename[0]))
-                identifier=cleanWithUnder(foo.fetchone()[0])
-
-                r= re.search("(\.[^.]*)$",oldFilename)
-
-                delimiter = ""
-                
-                if filename[2]:
-                    delimiter = "a"
-
-                newFilename =  "%s/%s/%s/%s_%s%s%s" % (aenttypename, attributename, identifier, identifier, filehash["%s%s" % (filename[0], attributename)],delimiter, r.group(0))
-                makeSurePathExists("%s/%s/%s/%s" % (exportDir, clean(directory[0]), clean(directory[1]), identifier))
-
-
-            exifdata = exifCon.execute("select * from %s where uuid = %s" % (aenttypename, filename[0])).fetchone()
-            iddata = [] 
-            for id in importCon.execute("select coalesce(measure, vocabname, freetext) from latestnondeletedarchentidentifiers where uuid = %s union select aenttypename from latestnondeletedarchent join aenttype using (aenttypeid) where uuid = %s" % (filename[0], filename[0])):
-                iddata.append(id[0])
-
-
-            shutil.copyfile(originalDir+filename[1], exportDir+newFilename)
-
-            mergedata = exifdata.copy()
-            mergedata.update(jsondata)
-            mergedata.pop("geospatialcolumn", None)
-            exifjson = {"SourceFile":exportDir+newFilename, 
-                        "UserComment": [json.dumps(mergedata)], 
-                        "ImageDescription": exifdata['identifier'], 
-                        "XPSubject": "Annotation: %s" % (filename[2]),
-                        "Keywords": iddata,
-                        "Artist": exifdata['createdBy'],
-                        "XPAuthor": exifdata['createdBy'],
-                        "Software": "FAIMS Project",
-                        "ImageID": exifdata['uuid'],
-                        "Copyright": jsondata['name']
-
-
-                        }
-            with open(exportDir+newFilename+".json", "w") as outfile:
-                json.dump(exifjson, outfile)    
-
-            if imghdr.what(exportDir+newFilename):
-                
-                subprocess.call(["exiftool", "-m", "-q", "-sep", "\"; \"", "-overwrite_original", "-j=%s" % (exportDir+newFilename+".json"), exportDir+newFilename])
-
-            exportPhotos.append((clean(aenttypename), attributename, newFilename, filename[0]))
-            print "    * %s" % (newFilename)
-            files.append(exportDir+newFilename+".json")
-            files.append(exportDir+newFilename)
-        else:
-            print "<b>Unable to find file %s, from uuid: %s" % (originalDir+filename[1], filename[0]) 
-    except:
-            print "<b>Unable to find file (exception thrown) %s, from uuid: %s" % (originalDir+filename[1], filename[0])    
-
-
-exportAttributes = {}
-for aenttypename, attributename, newFilename, uuid in exportPhotos:
-    if aenttypename not in realExportList:
-        realExportList[aenttypename] = {}
-        exportAttributes[aenttypename] = attributename
-    if uuid not in realExportList[aenttypename]:
-        realExportList[aenttypename][uuid] = []
-
-    realExportList[aenttypename][uuid].append(newFilename)
-
+#exportPhotos = []
+#realExportList = {}
+# 
+# print "* File list exported:"
+# for filename in importCon.execute("""
+# select uuid, measure, freetext, certainty, attributename, aenttypename, substr(measure,48) as sortname
+  # from latestnondeletedaentvalue 
+  # join attributekey using (attributeid) 
+  # join latestnondeletedarchent using (uuid) 
+  # join aenttype using (aenttypeid) 
+  # join idealaent using (aenttypeid, attributeid) 
+ # where attributeisfile is not null and measure is not null
+ # order by sortname;                                  
+                                  # """):
+    # try:        
+        # oldPath = filename[1].split("/")
+        # oldFilename = oldPath[2]
+        # aenttypename = clean(filename[5])
+        # attributename = clean(filename[4])
+        # newFilename = "%s/%s/%s" % (aenttypename, attributename, oldFilename)
+        # if os.path.isfile(originalDir+filename[1]):
+            # if (fileNameType == "Identifier"):
+                print filename[0]
+                # 
+                # filehash["%s%s" % (filename[0], attributename)] += 1
+                # 
+# 
+                # foo = exportCon.execute("select identifier from %s where uuid = %s" % (aenttypename, filename[0]))
+                # identifier=cleanWithUnder(foo.fetchone()[0])
+# 
+                # r= re.search("(\.[^.]*)$",oldFilename)
+# 
+                # delimiter = ""
+                # 
+                # if filename[2]:
+                    # delimiter = "a"
+# 
+                # newFilename =  "%s/%s/%s/%s_%s%s%s" % (aenttypename, attributename, identifier, identifier, filehash["%s%s" % (filename[0], attributename)],delimiter, r.group(0))
+                # makeSurePathExists("%s/%s/%s/%s" % (exportDir, clean(directory[0]), clean(directory[1]), identifier))
+# 
+# 
+            # exifdata = exifCon.execute("select * from %s where uuid = %s" % (aenttypename, filename[0])).fetchone()
+            # iddata = [] 
+            # for id in importCon.execute("select coalesce(measure, vocabname, freetext) from latestnondeletedarchentidentifiers where uuid = %s union select aenttypename from latestnondeletedarchent join aenttype using (aenttypeid) where uuid = %s" % (filename[0], filename[0])):
+                # iddata.append(id[0])
+# 
+# 
+            # shutil.copyfile(originalDir+filename[1], exportDir+newFilename)
+# 
+            # mergedata = exifdata.copy()
+            # mergedata.update(jsondata)
+            # mergedata.pop("geospatialcolumn", None)
+            # exifjson = {"SourceFile":exportDir+newFilename, 
+                        # "UserComment": [json.dumps(mergedata)], 
+                        # "ImageDescription": exifdata['identifier'], 
+                        # "XPSubject": "Annotation: %s" % (filename[2]),
+                        # "Keywords": iddata,
+                        # "Artist": exifdata['createdBy'],
+                        # "XPAuthor": exifdata['createdBy'],
+                        # "Software": "FAIMS Project",
+                        # "ImageID": exifdata['uuid'],
+                        # "Copyright": jsondata['name']
+# 
+# 
+                        # }
+            # with open(exportDir+newFilename+".json", "w") as outfile:
+                # json.dump(exifjson, outfile)    
+# 
+            # if imghdr.what(exportDir+newFilename):
+                # 
+                # subprocess.call(["exiftool", "-m", "-q", "-sep", "\"; \"", "-overwrite_original", "-j=%s" % (exportDir+newFilename+".json"), exportDir+newFilename])
+# 
+            # exportPhotos.append((clean(aenttypename), attributename, newFilename, filename[0]))
+            # print "    * %s" % (newFilename)
+            # files.append(exportDir+newFilename+".json")
+            # files.append(exportDir+newFilename)
+        # else:
+            # print "<b>Unable to find file %s, from uuid: %s" % (originalDir+filename[1], filename[0]) 
+    # except:
+            # print "<b>Unable to find file (exception thrown) %s, from uuid: %s" % (originalDir+filename[1], filename[0])    
+# 
+# 
+# exportAttributes = {}
+# for aenttypename, attributename, newFilename, uuid in exportPhotos:
+    # if aenttypename not in realExportList:
+        # realExportList[aenttypename] = {}
+        # exportAttributes[aenttypename] = attributename
+    # if uuid not in realExportList[aenttypename]:
+        # realExportList[aenttypename][uuid] = []
+# 
+    # realExportList[aenttypename][uuid].append(newFilename)
+# 
 #print "    ",realExportList
-
-
-for aenttypename in realExportList:
-
-    for uuid in realExportList[aenttypename]:
-        exportCon.execute("update %s set %s = ? where uuid = ?" % (aenttypename, exportAttributes[aenttypename]), (', '.join(realExportList[aenttypename][uuid]), uuid))
-exportCon.commit()
-
+# 
+# 
+# for aenttypename in realExportList:
+# 
+    # for uuid in realExportList[aenttypename]:
+        # exportCon.execute("update %s set %s = ? where uuid = ?" % (aenttypename, exportAttributes[aenttypename]), (', '.join(realExportList[aenttypename][uuid]), uuid))
+# exportCon.commit()
+# 
 
 
 
@@ -545,7 +545,8 @@ InfoKey: Trapped
 InfoValue: /False
 InfoBegin
 InfoKey: Producer
-InfoValue: Made by FAIMS Mobile and the exporter at https://github.com/FAIMS/scanExporter""" % (line['modifiedAtGMT'], "wibble", line['createdAtGMT'], line['FileReference'], line['Garrison'], line['Repository'], "wobble", "foo",line['DocName'],line['createdBy'])
+InfoValue: Made by FAIMS Mobile and the exporter at https://github.com/FAIMS/scanExporter
+""" % (line['modifiedAtGMT'], "wibble", line['createdAtGMT'], line['FileReference'], line['Garrison'], line['Repository'], "wobble", "foo",line['DocName'],line['createdBy'])
 
         meta = codecs.open("%s/%s.info"% (exportDir,clean(line['ID'])), "w", "utf-8")  
         meta.write(metadata)

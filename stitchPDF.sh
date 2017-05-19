@@ -116,7 +116,7 @@ done
 tiff2pdf -p A4 -F -j -q 90 -f -o "stage2/${3}_preoriginal.pdf" jpg2pdf/multi.tiff 
 
 
-ls stage2/*
+#ls stage2/*
 
 rm -rf jpg2pdf
 
@@ -126,13 +126,12 @@ rm -rf jpg2pdf
 cp ../../$3.md stage2/
 cp ../../$3.info stage2/
 cd stage2
-echo "" >> $3.info
-echo $?
+
 pandoc -i $3.md -t ConTeXt -s -o "${3}cover.tex"
 sed -i 's/\[letter\]/\[A4\]/g' "${3}cover.tex"
-echo $?
+
 context "${3}cover.tex" --purgeall --quiet --batchmode > /dev/null
-echo $?
+
 pdfunite "${3}cover.pdf" "${3}_preoriginal.pdf" "../${3}_original.pdf"
 pdfunite "${3}cover.pdf" "${3}_preOCR.pdf" "../${3}_OCR.pdf"
 cd ..
