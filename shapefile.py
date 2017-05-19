@@ -408,8 +408,8 @@ select uuid, measure, freetext, certainty, attributename, aenttypename, substr(m
 
             exportPhotos.append((clean(aenttypename), attributename, newFilename, filename[0]))
             print "    * %s" % (newFilename)
-            files.append(exportDir+newFilename+".json")
-            files.append(exportDir+newFilename)
+            #files.append(exportDir+newFilename+".json")
+            #files.append(exportDir+newFilename)
         else:
             print "<b>Unable to find file %s, from uuid: %s" % (originalDir+filename[1], filename[0]) 
     except:
