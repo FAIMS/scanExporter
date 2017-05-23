@@ -102,18 +102,55 @@ rm *.pdf
 mkdir jpg2pdf
 
 
-parallel 'convert {} -compress lzw -auto-orient jpg2pdf/{/.}.tiff' ::: $(find ../../ScanRecord/Files/$3 -name "*.jpg")
+#parallel 'convert {} -compress lzw -auto-orient jpg2pdf/{/.}.tiff' ::: $(find ../../ScanRecord/Files/$3 -name "*.jpg")
 
 #for file in $(find "../../ScanRecord/Files/$3" -name "*.jpg" | sort -V  ); do
 #        outfile="jpg2pdf/$(basename -s ".jpg" $file).tiff"
 #        convert "$file" -compress lzw -auto-orient "$outfile"
 #done
 
-for file in  $(find "jpg2pdf/" -name "*.tiff" | sort -V); do
-        tiffcp -a $file jpg2pdf/multi.tiff 2> /dev/null 
-done
+#for file in  $(find "jpg2pdf/" -name "*.tiff" | sort -V); do
+#        tiffcp -a $file jpg2pdf/multi.tiff 2> /dev/null 
+#done
 
-tiff2pdf -p A4 -F -j -q 90 -f -o "stage2/${3}_preoriginal.pdf" jpg2pdf/multi.tiff 
+#tiff2pdf -p A4 -F -j -q 90 -f -o "stage2/${3}_preoriginal.pdf" jpg2pdf/multi.tiff 
+
+cd jpg2pdf
+
+cat <<-HereDoc > "$3/${1##*/}.tex"
+\enableregime [utf]
+\mainlanguage [en]
+\setuppapersize[A4][A4]
+
+
+
+\setupexternalfigures[directory={${1}/}]
+
+\setuplayout[
+    backspace=0pt,
+    topspace=0pt,
+    header=0pt,
+    footer=0pt,
+    width=\pagewidth,
+    height=\pageheight
+    ]
+
+
+\setuppagenumbering[location={}]
+
+\starttext
+HereDoc
+
+
+
+
+find "$1" -name "*.jpg" -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][width=\textwidth][]" >> "${3}.tex"
+
+echo "\stoptext" >> "${3}.tex"
+
+context --purgeall "${3}.tex"
+mv "${3}.pdf" "../stage2/${3}_preoriginal.pdf"
+
 
 
 #ls stage2/*
