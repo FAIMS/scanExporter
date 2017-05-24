@@ -143,7 +143,7 @@ cat <<-HereDoc > "${3}.tex"
 
 
 
-\setupexternalfigures[directory={${3}}]
+%\setupexternalfigures[directory={${3}}]
 
 \setuplayout[
     backspace=0pt,
@@ -163,11 +163,14 @@ HereDoc
 
 
 
-find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][width=\textwidth][]" >> "${3}.tex"
+find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][width=\textwidth][]" >> "${3}.tex"
 
 echo "\stoptext" >> "${3}.tex"
 
-context --purgeall "${3}.tex"
+context --purgeall --quiet --batchmode "${3}.tex"
+
+ls
+
 mv "${3}.pdf" "../stage2/${3}_preoriginal.pdf"
 
 
