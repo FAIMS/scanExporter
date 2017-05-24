@@ -158,8 +158,8 @@ def dict_factory(cursor, row):
 
 def upper_repl(match):
     if (match.group(1) == None):
-        return ""
-    return match.group(1).upper()
+        return "_"
+    return "_"+match.group(1).upper()
 
 def clean(str):
      out = re.sub(" ([a-z])|[^A-Za-z0-9]+", upper_repl, str)     

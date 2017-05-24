@@ -20,7 +20,7 @@ echo "../../"
 ls -alR ../../
 
 echo "Finding Identifier $3"
-jpgPath=$(find ../../ -name "$3" -type d)
+jpgPath=$(find ../../ -name "Files/$3" -type d)
 
 echo $jpgPath
 
