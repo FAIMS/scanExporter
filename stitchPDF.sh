@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-echo $1 $2 $3 $4
+echo $1 $2 $3
 
 echo $* > /tmp/stitchPDF
 
