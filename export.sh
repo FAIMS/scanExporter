@@ -9,7 +9,7 @@
 json=`python -mjson.tool $2`
 
 
-find /tmp/ -name "tmp*" -! -name "$2" -! -name "$3" -! -name "$4" | xargs -I{} rm -rf {}
+find /tmp/ -name "tmp.*" -! -name "$2" -! -name "$3" -! -name "$4" | xargs -I{} echo {}
 
 
 echo "$0 $1 $2 $3 $4" > /tmp/exportRun
