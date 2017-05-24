@@ -20,13 +20,13 @@ echo "../../"
 ls -alR ../../
 
 echo "Finding Identifier $3"
-jpgPath=$(find ../../ -name "Files/$3" -type d)
 
-echo $jpgPath
+
+
 
 
 #find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert " $0 " " ++count ".pnm"}' /dev/stdin | bash
-find $jpgPath -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --no-notice
+find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --no-notice
 
 ls
 
