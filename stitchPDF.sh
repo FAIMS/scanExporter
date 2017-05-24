@@ -139,7 +139,7 @@ mkdir jpg2pdf
 
 cd jpg2pdf
 echo "ConTeXt"
-cat <<-HereDoc > "$3/${1##*/}.tex"
+cat <<-HereDoc > "${3}.tex"
 \enableregime [utf]
 \mainlanguage [en]
 \setuppapersize[A4][A4]
