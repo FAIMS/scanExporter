@@ -15,13 +15,10 @@ rm -rf pdf/$3
 mkdir -p pdf/$3
 cd pdf/$3
 
-echo "../../"
-
-ls -alR ../../
 
 echo "Finding Identifier $3"
 
-
+find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.original.jpg" ! -name '.*' | sort -V 
 
 
 
