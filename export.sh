@@ -8,6 +8,10 @@
 # read json interface input file into string
 json=`python -mjson.tool $2`
 
+
+find /tmp/ -name "tmp*" -! -name "$2" -! -name "$3" -! -name "$4" | xargs -I{} rm -rf {}
+
+
 echo "$0 $1 $2 $3 $4" > /tmp/exportRun
 
  
