@@ -107,8 +107,11 @@ for file in $(find . -name "*.txt" | sort -g); do
     rm $file
 done
 
+echo "listing preocr files"
+find .
+
 echo "preOCR.pdf"
-ls -alR
+
 
 pdfunite `find . -name "*.pdf"| sort -V` "stage2/${3}_preOCR.pdf"
 rm *.pdf

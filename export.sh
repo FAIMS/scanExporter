@@ -45,6 +45,6 @@ echo "
 "
 awk '{print "   "$0"\n"}' /tmp/foo >> $4
 
-
+sed -i -e "s/^/    /" $4
 
 # generate markup and pass output to markup file
