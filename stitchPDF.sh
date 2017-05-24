@@ -9,7 +9,8 @@ echo $* > /tmp/stitchPDF
 
 #echo ${2}ScanRecord/Files/$3
 IFS=$'\n'
-echo "<pre>"
+echo "```"
+echo "`"
 cd $2
 rm -rf pdf/$3
 mkdir -p pdf/$3
@@ -227,6 +228,6 @@ rm -rf stage2
 
 echo "* ${3}"
 ls | sed -e 's/^/    * /'
-echo "</pre>"
-
+echo "```"
+echo "`"
 exit 0
