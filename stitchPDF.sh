@@ -15,11 +15,9 @@ rm -rf pdf/$3
 mkdir -p pdf/$3
 cd pdf/$3
 
-ls
+echo "../../"
 
-ls ../
-
-ls ../../
+ls -alR ../../
 
 #find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert " $0 " " ++count ".pnm"}' /dev/stdin | bash
 find ../../ScanRecord/Files/$3 -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --no-notice
