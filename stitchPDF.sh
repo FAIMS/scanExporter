@@ -26,7 +26,7 @@ echo "Finding Identifier $3"
 
 
 #find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert " $0 " " ++count ".pnm"}' /dev/stdin | bash
-find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --no-notice
+find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.original.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --no-notice
 
 ls
 
@@ -146,15 +146,15 @@ cat <<-HereDoc > "${3}.tex"
 
 
 
-\setupexternalfigures[directory={${1}/}]
+\setupexternalfigures[directory={${1}}]
 
 \setuplayout[
     backspace=0pt,
     topspace=0pt,
     header=0pt,
     footer=0pt,
-    width=\pagewidth,
-    height=\pageheight
+%    width=\pagewidth,
+%    height=\pageheight
     ]
 
 
@@ -166,7 +166,7 @@ HereDoc
 
 
 
-find "$1" -name "*.jpg" -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][width=\textwidth][]" >> "${3}.tex"
+qfind ../../ -name "$3" -type d | xargs -I{} find {} -name "*.original.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][width=\textwidth][]" >> "${3}.tex"
 
 echo "\stoptext" >> "${3}.tex"
 
