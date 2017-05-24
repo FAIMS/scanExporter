@@ -19,14 +19,19 @@ echo "../../"
 
 ls -alR ../../
 
+echo "Finding Identifier $3"
 jpgPath=$(find ../../ -name "$3" -type d)
 
 
 #find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert " $0 " " ++count ".pnm"}' /dev/stdin | bash
 find $jpgPath -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --no-notice
 
+
+echo "Scantailor"
 parallel --no-notice "scantailor-cli --despeckle=normal --normalize-illumination --color-mode=black_and_white --dewarping=auto {} ./ ; rm {}" ::: $(find . -name "*.pnm" | sort -V)
 rm -rf cache
+
+echo "tiff2pdf"
 parallel --no-notice "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unpaper+tiff2pdf+pdftk+imagemagick+tesseract+exactimage' {} ; rm {}" ::: $(find . -name "*.tif")
 
 
@@ -51,7 +56,7 @@ parallel --no-notice "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unp
 #	tiff2pdf -o "$name.pdf" -z -u m -p "A4" -F $name.tif	
 #	rm $file	
 #done
-
+echo "pdf14"
 pdf14=$(cat <<-'HereDoc'
 mv {} {.}.bak;
 pdftk {.}.bak dump_data > {.}.info;
@@ -95,13 +100,13 @@ parallel "$pdf14" ::: $(find . -name "*.pdf")
 
 mkdir -p stage2
 
-
+echo "ENG.txt"
 for file in $(find . -name "*.txt" | sort -g); do
     cat $file  >> "stage2/${3}_ENG.txt"
     rm $file
 done
 
-
+echo "preOCR.pdf"
 pdfunite `find . -name "*.pdf"| sort -V` "stage2/${3}_preOCR.pdf"
 rm *.pdf
 #convert `find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V` -page a4 "stage2/${3}.pdf"
@@ -123,7 +128,7 @@ mkdir jpg2pdf
 #tiff2pdf -p A4 -F -j -q 90 -f -o "stage2/${3}_preoriginal.pdf" jpg2pdf/multi.tiff 
 
 cd jpg2pdf
-
+echo "ConTeXt"
 cat <<-HereDoc > "$3/${1##*/}.tex"
 \enableregime [utf]
 \mainlanguage [en]
@@ -171,6 +176,7 @@ cp ../../$3.md stage2/
 cp ../../$3.info stage2/
 cd stage2
 
+echo "finishing"
 
 echo "" >> $3.info
 
