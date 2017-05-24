@@ -9,8 +9,7 @@ echo $* > /tmp/stitchPDF
 
 #echo ${2}ScanRecord/Files/$3
 IFS=$'\n'
-echo "```"
-echo "`"
+
 cd $2
 rm -rf pdf/$3
 mkdir -p pdf/$3
@@ -23,18 +22,23 @@ ls -alR ../../
 echo "Finding Identifier $3"
 jpgPath=$(find ../../ -name "$3" -type d)
 
+echo $jpgPath
+
 
 #find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert " $0 " " ++count ".pnm"}' /dev/stdin | bash
 find $jpgPath -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --no-notice
 
+ls
 
 echo "Scantailor"
 parallel --no-notice "scantailor-cli --despeckle=normal --normalize-illumination --color-mode=black_and_white --dewarping=auto {} ./ ; rm {}" ::: $(find . -name "*.pnm" | sort -V)
 rm -rf cache
 
+ls
+
 echo "tiff2pdf"
 parallel --no-notice "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unpaper+tiff2pdf+pdftk+imagemagick+tesseract+exactimage' {} ; rm {}" ::: $(find . -name "*.tif")
-
+ls
 
 
 
@@ -233,6 +237,6 @@ rm -rf stage2
 
 echo "* ${3}"
 ls | sed -e 's/^/    * /'
-echo "```"
-echo "`"
+
+
 exit 0
