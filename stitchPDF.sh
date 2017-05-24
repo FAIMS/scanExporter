@@ -108,6 +108,8 @@ for file in $(find . -name "*.txt" | sort -g); do
 done
 
 echo "preOCR.pdf"
+ls -alR
+
 pdfunite `find . -name "*.pdf"| sort -V` "stage2/${3}_preOCR.pdf"
 rm *.pdf
 #convert `find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V` -page a4 "stage2/${3}.pdf"
