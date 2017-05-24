@@ -524,11 +524,11 @@ InfoKey: Subject
 InfoValue: wibble
 """ 
 
-        meta = codecs.open("%s/%s.info"% (exportDir,clean(line['Identifier'])), "w", "utf-8")  
+        meta = codecs.open("%s/%s.info"% (exportDir,clean(line['identifier'])), "w", "utf-8")  
         meta.write(metadata)
         meta.close()
 
-        f = codecs.open("%s/%s.md" % (exportDir,clean(line['Identifier'])), "w", "utf-8")  
+        f = codecs.open("%s/%s.md" % (exportDir,clean(line['identifier'])), "w", "utf-8")  
         photofiles =""
 
 
@@ -550,7 +550,7 @@ InfoValue: wibble
         f.close()
         
         try:
-            output= subprocess.check_output(["bash", "./stitchPDF.sh", originalDir, exportDir, clean(line['Identifier'])], stderr=subprocess.STDOUT)
+            output= subprocess.check_output(["bash", "./stitchPDF.sh", originalDir, exportDir, clean(line['identifier'])], stderr=subprocess.STDOUT)
             print output
         except Exception as e:
             print e, e.output
