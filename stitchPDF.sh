@@ -174,6 +174,8 @@ ls
 mv "${3}.pdf" "../stage2/${3}_preoriginal.pdf"
 
 
+cd ..
+
 
 #ls stage2/*
 
