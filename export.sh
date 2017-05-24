@@ -9,7 +9,7 @@
 json=`python -mjson.tool $2`
 
 
-find /tmp/ -name "tmp*" -mindepth 1 
+find /tmp/ -name "tmp*"
 
 
 echo "$0 $1 $2 $3 $4" > /tmp/exportRun
