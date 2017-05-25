@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mount proc /proc -t proc
+
 if mount | grep /proc > /dev/null; then
 	echo "Found proc"
 else
