@@ -1,5 +1,15 @@
 #!/bin/bash
+
+if mount | grep /proc > /dev/null; then
+	echo "Found proc"
+else
+	mount proc /proc -t proc	
+fi
+
 set -euo pipefail
+
+cpus=$(nproc --all)
+
 
 echo $1 $2 $3
 
@@ -23,19 +33,19 @@ find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' |
 
 
 #find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert " $0 " " ++count ".pnm"}' /dev/stdin | bash
-find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --no-notice
+find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --jobs $cpus --no-notice
 
-ls
+
 
 echo "Scantailor"
-parallel --no-notice "scantailor-cli --despeckle=normal --normalize-illumination --color-mode=black_and_white --dewarping=auto {} ./ ; rm {}" ::: $(find . -name "*.pnm" | sort -V)
+parallel --jobs $cpus --no-notice "scantailor-cli --despeckle=normal --normalize-illumination --color-mode=black_and_white --dewarping=auto {} ./ ; rm {}" ::: $(find . -name "*.pnm" | sort -V)
 rm -rf cache
 
-ls
+
 
 echo "tiff2pdf"
-parallel --no-notice "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unpaper+tiff2pdf+pdftk+imagemagick+tesseract+exactimage' {} ; rm {}" ::: $(find . -name "*.tif")
-ls
+parallel --jobs $cpus --no-notice "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unpaper+tiff2pdf+pdftk+imagemagick+tesseract+exactimage' {} ; rm {}" ::: $(find . -name "*.tif")
+
 
 
 
@@ -73,7 +83,7 @@ pdftk {.}.bk2 update_info {.}.info output {} 2< /dev/null;
 rm -f {.}.bak {.}.bk2 {.}.info {.}.png {.}.jpg {}.hocr;
 HereDoc
 )
-parallel "$pdf14" ::: $(find . -name "*.pdf") 
+parallel --jobs $cpus "$pdf14" ::: $(find . -name "*.pdf") 
 
 #echo "pdf 1.4"
 # for file in $(find . -name "*.pdf" | sort -V); do
@@ -121,7 +131,7 @@ rm *.pdf
 mkdir jpg2pdf
 
 
-#parallel 'convert {} -compress lzw -auto-orient jpg2pdf/{/.}.tiff' ::: $(find ../../ScanRecord/Files/$3 -name "*.jpg")
+#parallel --jobs $cpus 'convert {} -compress lzw -auto-orient jpg2pdf/{/.}.tiff' ::: $(find ../../ScanRecord/Files/$3 -name "*.jpg")
 
 #for file in $(find "../../ScanRecord/Files/$3" -name "*.jpg" | sort -V  ); do
 #        outfile="jpg2pdf/$(basename -s ".jpg" $file).tiff"
