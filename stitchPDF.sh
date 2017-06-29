@@ -4,7 +4,7 @@
 
 
 #set -euo pipefail
-
+IFS=$'\n\t'
 cpus=$(nproc --all)
 
 
@@ -175,8 +175,13 @@ HereDoc
 
 
 
+find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][scale=1000,maxwidth=\pagewidth, maxheight=\pageheight]" >> "temp.tex"
+for path in $(find ../../../ -name "$3" -type d); do
+	sed -i 's#$path##g' temp.tex
+done
 
-find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][width=\pagewidth]" >> "${3}.tex"
+cat temp.tex >> "${3}.tex"
+
 
 echo "\stoptext" >> "${3}.tex"
 
