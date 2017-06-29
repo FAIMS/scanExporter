@@ -147,7 +147,7 @@ cd jpg2pdf
 echo "ConTeXt"
 
 
-imageDir=$(find ../../../ -name "$3" -type d|tr '\n' ',')
+imageDir=$(find ../../../ -name "$3" -type d ! -path "pdf" |tr '\n' ',')
 
 cat <<-HereDoc > "${3}.tex"
 \enableregime [utf]
@@ -176,8 +176,12 @@ HereDoc
 
 
 find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][scale=1000,maxwidth=\pagewidth, maxheight=\pageheight]" >> "temp.tex"
+find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | xargs -I{} -0 cp {} .
+
+
 for path in $(find ../../../ -name "$3" -type d); do
-	sed -i 's#$path##g' temp.tex
+	echo "s#${path}##g"
+	sed -i "s#${path}##g" temp.tex
 done
 
 cat temp.tex >> "${3}.tex"
