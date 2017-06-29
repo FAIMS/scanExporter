@@ -145,7 +145,7 @@ cd jpg2pdf
 echo "ConTeXt"
 
 
-imageDir=$(find ../../../ -name "$3" -type d)
+imageDir=$(find ../../../ -name "$3" -type d|tr '\n' ',')
 
 cat <<-HereDoc > "${3}.tex"
 \enableregime [utf]
