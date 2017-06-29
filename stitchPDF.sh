@@ -18,7 +18,8 @@ echo $* > /tmp/stitchPDF
 IFS=$'\n'
 
 cd $2
-rm -rf pdf/$3
+#FIX
+#rm -rf pdf/$3
 mkdir -p pdf/$3
 cd pdf/$3
 
@@ -122,7 +123,8 @@ echo "preOCR.pdf"
 
 
 pdfunite `find . -name "*.pdf"| sort -V` "stage2/${3}_preOCR.pdf"
-rm *.pdf
+#FIX
+#rm *.pdf
 #convert `find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V` -page a4 "stage2/${3}.pdf"
 
 mkdir jpg2pdf
@@ -192,7 +194,9 @@ cd ..
 
 #ls stage2/*
 
-rm -rf jpg2pdf
+
+#FIX
+#rm -rf jpg2pdf
 
 #mv stage2/* .
 
@@ -247,8 +251,8 @@ pdfunite "${3}cover.pdf" "${3}_preOCR.pdf" "../${3}_OCR.pdf"
 cd ..
 
 cat stage2/$3.md "stage2/${3}_ENG.txt" > "${3}_ENG.txt"
-
-rm -rf stage2
+#FIX
+#rm -rf stage2
 
 echo "* ${3}"
 ls | sed -e 's/^/    * /'
