@@ -1,14 +1,9 @@
 #!/bin/bash
 
-mount proc /proc -t proc
+#mount proc /proc -t proc
 
-if mount | grep /proc > /dev/null; then
-	echo "Found proc"
-else
-	mount proc /proc -t proc	
-fi
 
-set -euo pipefail
+#set -euo pipefail
 
 cpus=$(nproc --all)
 
@@ -35,18 +30,18 @@ find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' |
 
 
 #find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert " $0 " " ++count ".pnm"}' /dev/stdin | bash
-find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --jobs $cpus --no-notice
+find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --no-notice
 
 
 
 echo "Scantailor"
-parallel --jobs $cpus --no-notice "scantailor-cli --despeckle=normal --normalize-illumination --color-mode=black_and_white --dewarping=auto {} ./ ; rm {}" ::: $(find . -name "*.pnm" | sort -V)
+parallel --no-notice "scantailor-cli --despeckle=normal --normalize-illumination --color-mode=black_and_white --dewarping=auto {} ./ ; rm {}" ::: $(find . -name "*.pnm" | sort -V)
 rm -rf cache
 
 
 
 echo "tiff2pdf"
-parallel --jobs $cpus --no-notice "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unpaper+tiff2pdf+pdftk+imagemagick+tesseract+exactimage' {} ; rm {}" ::: $(find . -name "*.tif")
+parallel --no-notice "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unpaper+tiff2pdf+pdftk+imagemagick+tesseract+exactimage' {} ; rm {}" ::: $(find . -name "*.tif")
 
 
 
@@ -85,7 +80,7 @@ pdftk {.}.bk2 update_info {.}.info output {} 2< /dev/null;
 rm -f {.}.bak {.}.bk2 {.}.info {.}.png {.}.jpg {}.hocr;
 HereDoc
 )
-parallel --jobs $cpus "$pdf14" ::: $(find . -name "*.pdf") 
+parallel "$pdf14" ::: $(find . -name "*.pdf") 
 
 #echo "pdf 1.4"
 # for file in $(find . -name "*.pdf" | sort -V); do
@@ -148,6 +143,10 @@ mkdir jpg2pdf
 
 cd jpg2pdf
 echo "ConTeXt"
+
+
+
+
 cat <<-HereDoc > "${3}.tex"
 \enableregime [utf]
 \mainlanguage [en]
@@ -155,7 +154,7 @@ cat <<-HereDoc > "${3}.tex"
 
 
 
-%\setupexternalfigures[directory={${3}}]
+\setupexternalfigures[directory={${find ../../../ -name "$3" -type d}}]
 
 \setuplayout[
     backspace=0pt,
@@ -175,13 +174,15 @@ HereDoc
 
 
 
-find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][width=\pagewidth][]" >> "${3}.tex"
+find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][width=\pagewidth]" >> "${3}.tex"
 
 echo "\stoptext" >> "${3}.tex"
 
 context --purgeall --quiet --batchmode "${3}.tex"
 
 ls
+
+mv "${3}.tex" "../${3}_preoriginal.tex"
 
 mv "${3}.pdf" "../stage2/${3}_preoriginal.pdf"
 
