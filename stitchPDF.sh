@@ -145,7 +145,7 @@ cd jpg2pdf
 echo "ConTeXt"
 
 
-
+imageDir=$(find ../../../ -name "$3" -type d)
 
 cat <<-HereDoc > "${3}.tex"
 \enableregime [utf]
@@ -154,7 +154,7 @@ cat <<-HereDoc > "${3}.tex"
 
 
 
-\setupexternalfigures[directory={${find ../../../ -name "$3" -type d}}]
+\setupexternalfigures[directory={${imageDir}}]
 
 \setuplayout[
     backspace=0pt,
