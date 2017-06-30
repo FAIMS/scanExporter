@@ -60,9 +60,10 @@ else
 	esac
 fi	
 
+find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | xargs -0 -I{} identify {} | cut -d' ' -f3 | awk -F x -- '/[0-9]/ {print "\\definepapersize[sheet][width=" $1"px,height=" $2 "px]"}' > geometry
 
-
-
+geometry=$(cat geometry)
+echo $geometry
 
 #find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V 
 
@@ -191,8 +192,8 @@ imageDir=$(find ../../../ -name "$3" -type d ! -path "pdf" |tr '\n' ',')
 cat <<-HereDoc > "${3}.tex"
 \enableregime [utf]
 \mainlanguage [en]
-
-\setuppapersize[A4,${paper}][A4,${paper}]
+${geometry}
+\setuppapersize[sheet,${paper}][sheet,${paper}]
 
 
 
