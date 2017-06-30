@@ -180,6 +180,10 @@ def makeSurePathExists(path):
 originalDir = sys.argv[1]
 exportDir = tempfile.mkdtemp()+"/"
 finalExportDir = sys.argv[2]+"/"
+options= sys.argv[3]
+print(options)
+
+
 importDB = originalDir+"db.sqlite3"
 exportDB = exportDir+"shape.sqlite3"
 jsondata = json.load(open(originalDir+'module.settings'))

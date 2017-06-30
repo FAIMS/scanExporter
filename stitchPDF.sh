@@ -19,7 +19,7 @@ IFS=$'\n'
 
 cd $2
 #FIX
-#rm -rf pdf/$3
+rm -rf pdf/$3
 mkdir -p pdf/$3
 cd pdf/$3
 
@@ -124,7 +124,7 @@ echo "preOCR.pdf"
 
 pdfunite `find . -name "*.pdf"| sort -V` "stage2/${3}_preOCR.pdf"
 #FIX
-#rm *.pdf
+rm *.pdf
 #convert `find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V` -page a4 "stage2/${3}.pdf"
 
 mkdir jpg2pdf
@@ -204,7 +204,7 @@ cd ..
 
 
 #FIX
-#rm -rf jpg2pdf
+rm -rf jpg2pdf
 
 #mv stage2/* .
 
@@ -220,7 +220,7 @@ echo "" >> $3.info
 pandoc -i $3.md -t ConTeXt -s -o "${3}cover.tex"
 sed -i 's/\[letter\]/\[A4\]/g' "${3}cover.tex"
 
-context "${3}cover.tex" --purgeall --quiet --batchmode > /dev/null
+context "${3}cover.tex" --purgeall --quiet --silent --batchmode > /dev/null
 
 pdfunite "${3}cover.pdf" "${3}_preoriginal.pdf" "../${3}_originalfull.pdf"
 pdfunite "${3}cover.pdf" "${3}_preOCR.pdf" "../${3}_OCR.pdf"
@@ -260,7 +260,7 @@ cd ..
 
 cat stage2/$3.md "stage2/${3}_ENG.txt" > "${3}_ENG.txt"
 #FIX
-#rm -rf stage2
+rm -rf stage2
 
 echo "* ${3}"
 ls | sed -e 's/^/    * /'

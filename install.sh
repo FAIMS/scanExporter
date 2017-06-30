@@ -1,5 +1,10 @@
+. /etc/lsb-release
+if [ "$DISTRIB_CODENAME" == "trusty"]; then
+	sudo add-apt-repository ppa:jonathonf/texlive-2016 -y
+fi
+sudo apt update
 
-sudo apt-get install spatialite-bin libimage-exiftool-perl imagemagick scantailor libtiff-tools pdftk tesseract-ocr exactimage poppler-utils pandoc parallel -y
+sudo apt-get install spatialite-bin libimage-exiftool-perl imagemagick scantailor libtiff-tools pdftk tesseract-ocr exactimage poppler-utils pandoc context parallel -y
 sudo mkdir -p /home/ubuntu/.parallel
 sudo touch /home/ubuntu/.parallel/will-cite
 sudo mkdir -p /root/.parallel
