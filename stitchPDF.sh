@@ -60,10 +60,11 @@ else
 	esac
 fi	
 
-find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | xargs -0 -I{} identify {} | cut -d' ' -f3 | awk -F x -- '/[0-9]/ {print "\\definepapersize[sheet][width=" $1"px,height=" $2 "px]"}' > geometry
+find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | xargs -0 -I{} identify {} | cut -d' ' -f3 | awk -F x -- '/[0-9]/ {print "\\definepapersize[sheet][width=" $1"px,height=" $2 "px]"}' | uniq > geometry
 
 geometry=$(cat geometry)
 echo $geometry
+rm geometry
 
 #find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V 
 
@@ -216,7 +217,7 @@ HereDoc
 
 
 
-find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][maxwidth=\pagewidth, maxheight=\pageheight, orientation=${orientation}]" >> "temp.tex"
+find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][width=\pagewidth, height=\pageheight, maxwidth=\pagewidth, maxheight=\pageheight, orientation=${orientation}]" >> "temp.tex"
 
 
 for path in $(find ../../../ -name "$3" -type d); do
