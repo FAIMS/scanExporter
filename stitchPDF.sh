@@ -230,7 +230,7 @@ cat temp.tex >> "${3}.tex"
 
 echo "\stoptext" >> "${3}.tex"
 
-context --purgeall --quiet --batchmode "${3}.tex"
+context --purgeall --quiet --batchmode "${3}.tex" &> "../${3}tex.log"
 
 ls
 
@@ -262,7 +262,7 @@ echo "" >> $3.info
 pandoc -i $3.md -t ConTeXt -s -o "${3}cover.tex"
 sed -i 's/\[letter\]/\[A4\]/g' "${3}cover.tex"
 
-context "${3}cover.tex" --purgeall --quiet --silent --batchmode > /dev/null
+context "${3}cover.tex" --purgeall --quiet --silent --batchmode &> "../${3}cover.log"
 
 pdfunite "${3}cover.pdf" "${3}_preoriginal.pdf" "../${3}_originalfull.pdf"
 pdfunite "${3}cover.pdf" "${3}_preOCR.pdf" "../${3}_OCR.pdf"
