@@ -150,16 +150,16 @@ parallel "$pdf14" ::: $(find . -name "*.pdf")
 
 mkdir -p stage2
 
-echo "ENG.txt"
+echo "${3}_ENG.txt"
 for file in $(find . -name "*.txt" | sort -g); do
     cat $file  >> "stage2/${3}_ENG.txt"
     rm $file
 done
 
-echo "listing preocr files"
-find .
+#echo "listing preocr files"
+#find .
 
-echo "preOCR.pdf"
+echo "${3}_preOCR.pdf"
 
 
 pdfunite `find . -name "*.pdf"| sort -V` "stage2/${3}_preOCR.pdf"
@@ -224,7 +224,7 @@ find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*
 
 
 for path in $(find ../../../ -name "$3" -type d); do
-	echo "s#${path}/##g"
+	#echo "s#${path}/##g"
 	sed -i "s#${path}/##g" temp.tex
 done
 
@@ -235,7 +235,7 @@ echo "\stoptext" >> "${3}.tex"
 mkdir ../log/
 context --purgeall --quiet --batchmode "${3}.tex" &> "../log/${3}tex.log"
 
-ls
+#ls
 
 mv "${3}.tex" "../log/${3}_preoriginal.tex"
 
