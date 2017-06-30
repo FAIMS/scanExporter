@@ -24,9 +24,43 @@ mkdir -p pdf/$3
 cd pdf/$3
 
 
+
+
+
 echo "Finding Identifier $3"
 
-find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V 
+
+if [ -z "$4" ]; then
+	echo "no argument for orientation"
+	orientation=90
+	paper="landscape"
+	scanOrient="left"
+else
+	echo "$4"
+	orientation=$4
+	if [ "$orientation" -eq "0" -o "$orientation" -eq "180" ]; then
+		paper="portrait"
+	else
+		paper="landscape"
+	fi
+
+	case "$4" in
+		0) 
+			scanOrient="none";;
+		90) 
+			scanOrient="left";;
+		180) 
+			scanOrient="upsidedown";;
+		240) 
+			scanOrient="right";;
+	easc
+fi	
+
+
+
+
+
+#find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V 
 
 #Brian plan. Copy jpgs in and rotate them first.
 
@@ -36,7 +70,7 @@ find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' |
 
 
 echo "Scantailor"
-parallel --no-notice "scantailor-cli --despeckle=normal --normalize-illumination --color-mode=black_and_white --dewarping=auto {} ./ ; rm {}" ::: $(find . -name "*.pnm" | sort -V)
+parallel --no-notice "scantailor-cli --orientation=${scanOrient} --despeckle=normal --normalize-illumination --color-mode=black_and_white --dewarping=auto {} ./ ; rm {}" ::: $(find . -name "*.pnm" | sort -V)
 rm -rf cache
 
 
@@ -148,23 +182,6 @@ echo "ConTeXt"
 
 
 imageDir=$(find ../../../ -name "$3" -type d ! -path "pdf" |tr '\n' ',')
-
-if [ -z "$4" ]; then
-	echo "no argument for orientation"
-	orientation=90
-	paper="landscape"
-else
-	echo "$4"
-	orientation=$4
-	if [ "$orientation" -eq "0" -o "$orientation" -eq "180" ]; then
-		paper="portrait"
-	else
-		paper="landscape"
-	fi
-fi	
-
-
-
 
 
 cat <<-HereDoc > "${3}.tex"
