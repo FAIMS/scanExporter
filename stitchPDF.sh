@@ -28,7 +28,7 @@ echo "Finding Identifier $3"
 
 find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V 
 
-
+#Brian plan. Copy jpgs in and rotate them first.
 
 #find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert " $0 " " ++count ".pnm"}' /dev/stdin | bash
 find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --no-notice
@@ -176,12 +176,11 @@ HereDoc
 
 
 find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][scale=1000,maxwidth=\pagewidth, maxheight=\pageheight]" >> "temp.tex"
-find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | xargs -I{} -0 cp {} .
 
 
 for path in $(find ../../../ -name "$3" -type d); do
-	echo "s#${path}##g"
-	sed -i "s#${path}##g" temp.tex
+	echo "s#${path}/##g"
+	sed -i "s#${path}/##g" temp.tex
 done
 
 cat temp.tex >> "${3}.tex"
