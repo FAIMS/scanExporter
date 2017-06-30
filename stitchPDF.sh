@@ -149,10 +149,29 @@ echo "ConTeXt"
 
 imageDir=$(find ../../../ -name "$3" -type d ! -path "pdf" |tr '\n' ',')
 
+if [ -z "$4" ]; then
+	echo "no argument for orientation"
+	orientation=90
+	paper="landscape"
+else
+	echo "$4"
+	orientation=$4
+	if [ "$orientation" -eq "0" -o "$orientation" -eq "180" ]; then
+		paper="portrait"
+	else
+		paper="landscape"
+	fi
+fi	
+
+
+
+
+
 cat <<-HereDoc > "${3}.tex"
 \enableregime [utf]
 \mainlanguage [en]
-\setuppapersize[A4][A4]
+
+\setuppapersize[A4,${paper}][A4,${paper}]
 
 
 
@@ -173,13 +192,7 @@ cat <<-HereDoc > "${3}.tex"
 \starttext
 HereDoc
 
-if [ -z "$4" ]; then
-	echo "no argument for orientation"
-	orientation=90
-else
-	echo "$4"
-	orientation=$4
-fi	
+
 
 find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][scale=1000,maxwidth=\pagewidth, maxheight=\pageheight, orientation=${orientation}]" >> "temp.tex"
 
