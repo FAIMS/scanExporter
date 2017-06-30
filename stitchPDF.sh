@@ -173,9 +173,15 @@ cat <<-HereDoc > "${3}.tex"
 \starttext
 HereDoc
 
+if [ -z "$4" ]; then
+	echo "no argument for orientation"
+	orientation=90
+else
+	echo "$4"
+	orientation=$4
+fi	
 
-
-find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][scale=1000,maxwidth=\pagewidth, maxheight=\pageheight]" >> "temp.tex"
+find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][scale=1000,maxwidth=\pagewidth, maxheight=\pageheight, orientation=${orientation}]" >> "temp.tex"
 
 
 for path in $(find ../../../ -name "$3" -type d); do

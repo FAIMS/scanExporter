@@ -180,8 +180,10 @@ def makeSurePathExists(path):
 originalDir = sys.argv[1]
 exportDir = tempfile.mkdtemp()+"/"
 finalExportDir = sys.argv[2]+"/"
-options= sys.argv[3]
-print(options)
+
+options = {"Rotation":"90"}
+with open(sys.argv[3]) as json_file:
+    options = json.load(json_file)
 
 
 importDB = originalDir+"db.sqlite3"
@@ -554,7 +556,7 @@ InfoValue: wibble
         f.close()
         
         try:
-            output= subprocess.check_output(["bash", "./stitchPDF.sh", originalDir, exportDir, clean(line['identifier'])], stderr=subprocess.STDOUT)
+            output= subprocess.check_output(["bash", "./stitchPDF.sh", originalDir, exportDir, clean(line['identifier']), options['Rotation']], stderr=subprocess.STDOUT)
             print output
         except Exception as e:
             print e, e.output
