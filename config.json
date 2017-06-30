@@ -3,14 +3,13 @@
   "version": 94,
   "key": "dcffa996-01e0-11e6-a820-3c970e0cc7d6",
    "interface":[{
-         "type":"dropdown",
-         "label":"Rotation",
-         "items":[
-           "Landscape, Book base towards left of phone",
-           "Landscape, Book base towards right of phone",
-           "Portrait, Book base towards home button",
-           "Portrait, Book base towards top of phone",
-         ],
-         "default":"Landscape, Book base towards left of phone"
-       }]
+      "type":"dropdown",
+      "label":"Label3",
+      "items":[
+        "Item1",
+        "Item2",
+        "Item3"
+      ],
+      "default":"Item2"
+    }]
 }
