@@ -217,7 +217,7 @@ HereDoc
 
 
 
-find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][width=\pagewidth, height=\pageheight, maxwidth=\pagewidth, maxheight=\pageheight, orientation=${orientation}]" >> "temp.tex"
+find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\externalfigure[{}][width=\pageheight, maxwidth=\pagewidth, maxheight=\pageheight, orientation=${orientation}]" >> "temp.tex"
 
 
 for path in $(find ../../../ -name "$3" -type d); do
