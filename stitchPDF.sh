@@ -215,9 +215,12 @@ ${geometry}
 \starttext
 HereDoc
 
+cp ../../$3.md .
+
+pandoc $3.md -t ConTeXt -s >> "${3}.tex"
 
 
-find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I{} -0 echo  "\startpagefigure\externalfigure[{}][orientation=${orientation}]\stoppagefigure" >> "temp.tex"
+find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I() -0 echo  "\startTEXpage\externalfigure[()][orientation=${orientation}]{}\stopTEXpage" >> "temp.tex"
 
 
 for path in $(find ../../../ -name "$3" -type d); do
@@ -229,12 +232,12 @@ cat temp.tex >> "${3}.tex"
 
 
 echo "\stoptext" >> "${3}.tex"
-
-context --purgeall --quiet --batchmode "${3}.tex" &> "../${3}tex.log"
+mkdir ../log/
+context --purgeall --quiet --batchmode "${3}.tex" &> "../log/${3}tex.log"
 
 ls
 
-mv "${3}.tex" "../${3}_preoriginal.tex"
+mv "${3}.tex" "../log/${3}_preoriginal.tex"
 
 mv "${3}.pdf" "../stage2/${3}_preoriginal.pdf"
 
@@ -259,12 +262,14 @@ echo "finishing"
 
 echo "" >> $3.info
 
-pandoc -i $3.md -t ConTeXt -s -o "${3}cover.tex"
+pandoc $3.md -t ConTeXt -s -o "${3}cover.tex"
+
 sed -i 's/\[letter\]/\[A4\]/g' "${3}cover.tex"
 
-context "${3}cover.tex" --purgeall --quiet --silent --batchmode &> "../${3}cover.log"
+context "${3}cover.tex" --purgeall --quiet --silent --batchmode &> "../log/${3}cover.log"
 
-pdfunite "${3}cover.pdf" "${3}_preoriginal.pdf" "../${3}_originalfull.pdf"
+#pdfunite "${3}cover.pdf" "${3}_preoriginal.pdf" "../${3}_originalfull.pdf"
+cp "${3}_preoriginal.pdf" "../${3}_originalfull.pdf"
 pdfunite "${3}cover.pdf" "${3}_preOCR.pdf" "../${3}_OCR.pdf"
 
 
