@@ -46,14 +46,18 @@ else
 
 	case "$4" in
 		0) 
-			scanOrient="none";;
+			scanOrient="none"
+			;;
 		90) 
-			scanOrient="left";;
+			scanOrient="left"
+			;;
 		180) 
-			scanOrient="upsidedown";;
+			scanOrient="upsidedown"
+			;;
 		240) 
-			scanOrient="right";;
-	easc
+			scanOrient="right"
+			;;
+	esac
 fi	
 
 
