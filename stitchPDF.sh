@@ -195,7 +195,7 @@ cat <<-HereDoc > "${3}.tex"
 \mainlanguage [en]
 ${geometry}
 \setuppapersize[sheet,${paper}][sheet,${paper}]
-\switchtobodyfont[modern,.05\pageheight]
+\switchtobodyfont[modern,48pt]
 
 
 \setupexternalfigures[directory={${imageDir}}]
@@ -217,7 +217,9 @@ HereDoc
 
 cp ../../../$3.md .
 
-pandoc $3.md -t ConTeXt -s >> "${3}.tex"
+sed -i 's#  -#    -#g' $3.md
+
+pandoc $3.md -t ConTeXt >> "${3}.tex"
 
 
 find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -Ixx -0 echo  "\startTEXpage\externalfigure[xx][orientation=${orientation}]{}\stopTEXpage" >> "temp.tex"
