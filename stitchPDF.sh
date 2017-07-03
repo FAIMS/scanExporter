@@ -3,7 +3,7 @@
 #mount proc /proc -t proc
 
 
-#set -euo pipefail
+set -euo pipefail
 IFS=$'\n\t'
 cpus=$(nproc --all)
 
@@ -215,12 +215,12 @@ ${geometry}
 \starttext
 HereDoc
 
-cp ../../$3.md .
+cp ../../../$3.md .
 
 pandoc $3.md -t ConTeXt -s >> "${3}.tex"
 
 
-find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I() -0 echo  "\startTEXpage\externalfigure[()][orientation=${orientation}]{}\stopTEXpage" >> "temp.tex"
+find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -Ixx -0 echo  "\startTEXpage\externalfigure[xx][orientation=${orientation}]{}\stopTEXpage" >> "temp.tex"
 
 
 for path in $(find ../../../ -name "$3" -type d); do
