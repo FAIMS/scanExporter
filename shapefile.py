@@ -158,8 +158,8 @@ def dict_factory(cursor, row):
 
 def upper_repl(match):
     if (match.group(1) == None):
-        return ""
-    return match.group(1).upper()
+        return "_"
+    return "_"+match.group(1).upper()
 
 def clean(str):
      out = re.sub(" ([a-z])|[^A-Za-z0-9]+", upper_repl, str)     
@@ -180,6 +180,12 @@ def makeSurePathExists(path):
 originalDir = sys.argv[1]
 exportDir = tempfile.mkdtemp()+"/"
 finalExportDir = sys.argv[2]+"/"
+
+options = {"Rotation":"90"}
+with open(sys.argv[3]) as json_file:
+    options = json.load(json_file)
+
+
 importDB = originalDir+"db.sqlite3"
 exportDB = exportDir+"shape.sqlite3"
 jsondata = json.load(open(originalDir+'module.settings'))
@@ -247,7 +253,7 @@ exportCon.execute("create table keyval (key text, val text);")
 f = open(arch16nFile, 'r')
 for line in f:
     if "=" in line:
-        keyval = line.replace("\n","").replace("\r","").decode("utf-8").split('=')
+        keyval = line.replace("\n","").replace("\r","").decode("utf-8").split('=',1)
         keyval[0] = '{'+keyval[0]+'}'
         exportCon.execute("replace into keyval(key, val) VALUES(?, ?)", keyval)
 f.close()
@@ -524,11 +530,11 @@ InfoKey: Subject
 InfoValue: wibble
 """ 
 
-        meta = codecs.open("%s/%s.info"% (exportDir,clean(line['ID'])), "w", "utf-8")  
+        meta = codecs.open("%s/%s.info"% (exportDir,clean(line['identifier'])), "w", "utf-8")  
         meta.write(metadata)
         meta.close()
 
-        f = codecs.open("%s/%s.md" % (exportDir,clean(line['ID'])), "w", "utf-8")  
+        f = codecs.open("%s/%s.md" % (exportDir,clean(line['identifier'])), "w", "utf-8")  
         photofiles =""
 
 
@@ -550,7 +556,7 @@ InfoValue: wibble
         f.close()
         
         try:
-            output= subprocess.check_output(["bash", "./stitchPDF.sh", originalDir, exportDir, clean(line['ID'])], stderr=subprocess.STDOUT)
+            output= subprocess.check_output(["bash", "./stitchPDF.sh", originalDir, exportDir, clean(line['identifier']), options['Rotation']], stderr=subprocess.STDOUT)
             print output
         except Exception as e:
             print e, e.output

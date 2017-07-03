@@ -1,7 +1,14 @@
 #!/bin/bash
-set -euo pipefail
 
-#echo $1 $2 $3 $4
+#mount proc /proc -t proc
+
+
+#set -euo pipefail
+IFS=$'\n\t'
+cpus=$(nproc --all)
+
+
+echo $1 $2 $3
 
 echo $* > /tmp/stitchPDF
 
@@ -11,15 +18,70 @@ echo $* > /tmp/stitchPDF
 IFS=$'\n'
 
 cd $2
+#FIX
 rm -rf pdf/$3
 mkdir -p pdf/$3
 cd pdf/$3
 
-#find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert " $0 " " ++count ".pnm"}' /dev/stdin | bash
-find ../../ScanRecord/Files/$3 -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --no-notice
 
-parallel --no-notice "scantailor-cli --despeckle=normal --normalize-illumination --color-mode=black_and_white --dewarping=auto {} ./ ; rm {}" ::: $(find . -name "*.pnm" | sort -V)
+
+
+
+echo "Finding Identifier $3"
+
+
+if [ -z "$4" ]; then
+	echo "no argument for orientation"
+	orientation=90
+	paper="landscape"
+	scanOrient="left"
+else
+	echo "$4"
+	orientation=$4
+	if [ "$orientation" -eq "0" -o "$orientation" -eq "180" ]; then
+		paper="portrait"
+	else
+		paper="landscape"
+	fi
+
+	case "$4" in
+		0) 
+			scanOrient="none"
+			;;
+		90) 
+			scanOrient="left"
+			;;
+		180) 
+			scanOrient="upsidedown"
+			;;
+		240) 
+			scanOrient="right"
+			;;
+	esac
+fi	
+
+find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | xargs -0 -I{} identify {} | cut -d' ' -f3 | awk -F x -- '/[0-9]/ {print "\\definepapersize[sheet][width=" $1"px,height=" $2 "px]"}' | uniq > geometry
+
+geometry=$(cat geometry)
+echo $geometry
+rm geometry
+
+#find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V 
+
+#Brian plan. Copy jpgs in and rotate them first.
+
+#find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert " $0 " " ++count ".pnm"}' /dev/stdin | bash
+find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V | awk -- 'BEGIN{ FS="[/.]+"} {print "convert \"" $0 "\" " ++count ".pnm"}' /dev/stdin | parallel --no-notice
+
+
+
+echo "Scantailor"
+parallel --no-notice "scantailor-cli --orientation=${scanOrient} --despeckle=normal --normalize-illumination --color-mode=black_and_white --dewarping=auto {} ./ ; rm {}" ::: $(find . -name "*.pnm" | sort -V)
 rm -rf cache
+
+
+
+echo "tiff2pdf"
 parallel --no-notice "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unpaper+tiff2pdf+pdftk+imagemagick+tesseract+exactimage' {} ; rm {}" ::: $(find . -name "*.tif")
 
 
@@ -44,7 +106,7 @@ parallel --no-notice "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unp
 #	tiff2pdf -o "$name.pdf" -z -u m -p "A4" -F $name.tif	
 #	rm $file	
 #done
-
+echo "pdf14"
 pdf14=$(cat <<-'HereDoc'
 mv {} {.}.bak;
 pdftk {.}.bak dump_data > {.}.info;
@@ -88,36 +150,105 @@ parallel "$pdf14" ::: $(find . -name "*.pdf")
 
 mkdir -p stage2
 
-
+echo "${3}_ENG.txt"
 for file in $(find . -name "*.txt" | sort -g); do
     cat $file  >> "stage2/${3}_ENG.txt"
     rm $file
 done
 
+#echo "listing preocr files"
+#find .
+
+echo "${3}_preOCR.pdf"
+
 
 pdfunite `find . -name "*.pdf"| sort -V` "stage2/${3}_preOCR.pdf"
+#FIX
 rm *.pdf
 #convert `find ../../ScanRecord/Files/$3 -name "*.jpg"| sort -V` -page a4 "stage2/${3}.pdf"
 
 mkdir jpg2pdf
 
 
-parallel 'convert {} -compress lzw -auto-orient jpg2pdf/{/.}.tiff' ::: $(find ../../ScanRecord/Files/$3 -name "*.jpg")
+#parallel --jobs $cpus 'convert {} -compress lzw -auto-orient jpg2pdf/{/.}.tiff' ::: $(find ../../ScanRecord/Files/$3 -name "*.jpg")
 
 #for file in $(find "../../ScanRecord/Files/$3" -name "*.jpg" | sort -V  ); do
 #        outfile="jpg2pdf/$(basename -s ".jpg" $file).tiff"
 #        convert "$file" -compress lzw -auto-orient "$outfile"
 #done
 
-for file in  $(find "jpg2pdf/" -name "*.tiff" | sort -V); do
-        tiffcp -a $file jpg2pdf/multi.tiff 2> /dev/null 
+#for file in  $(find "jpg2pdf/" -name "*.tiff" | sort -V); do
+#        tiffcp -a $file jpg2pdf/multi.tiff 2> /dev/null 
+#done
+
+#tiff2pdf -p A4 -F -j -q 90 -f -o "stage2/${3}_preoriginal.pdf" jpg2pdf/multi.tiff 
+
+cd jpg2pdf
+echo "ConTeXt"
+
+
+imageDir=$(find ../../../ -name "$3" -type d ! -path "pdf" |tr '\n' ',')
+
+
+cat <<-HereDoc > "${3}.tex"
+\enableregime [utf]
+\mainlanguage [en]
+${geometry}
+\setuppapersize[sheet,${paper}][sheet,${paper}]
+
+
+
+\setupexternalfigures[directory={${imageDir}}]
+
+\setuplayout[
+    backspace=0pt,
+    topspace=0pt,
+    header=0pt,
+    footer=0pt,
+%    width=\pagewidth,
+%    height=\pageheight
+    ]
+
+
+\setuppagenumbering[location={}]
+
+\starttext
+HereDoc
+
+cp ../../$3.md .
+
+pandoc $3.md -t ConTeXt -s >> "${3}.tex"
+
+
+find ../../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | sort -V -z  | xargs -I() -0 echo  "\startTEXpage\externalfigure[()][orientation=${orientation}]{}\stopTEXpage" >> "temp.tex"
+
+
+for path in $(find ../../../ -name "$3" -type d); do
+	#echo "s#${path}/##g"
+	sed -i "s#${path}/##g" temp.tex
 done
 
-tiff2pdf -p A4 -F -j -q 90 -f -o "stage2/${3}_preoriginal.pdf" jpg2pdf/multi.tiff 
+cat temp.tex >> "${3}.tex"
+
+
+echo "\stoptext" >> "${3}.tex"
+mkdir ../log/
+context --purgeall --quiet --batchmode "${3}.tex" &> "../log/${3}tex.log"
+
+#ls
+
+mv "${3}.tex" "../log/${3}_preoriginal.tex"
+
+mv "${3}.pdf" "../stage2/${3}_preoriginal.pdf"
+
+
+cd ..
 
 
 #ls stage2/*
 
+
+#FIX
 rm -rf jpg2pdf
 
 #mv stage2/* .
@@ -127,15 +258,18 @@ cp ../../$3.md stage2/
 cp ../../$3.info stage2/
 cd stage2
 
+echo "finishing"
 
 echo "" >> $3.info
 
-pandoc -i $3.md -t ConTeXt -s -o "${3}cover.tex"
+pandoc $3.md -t ConTeXt -s -o "${3}cover.tex"
+
 sed -i 's/\[letter\]/\[A4\]/g' "${3}cover.tex"
 
-context "${3}cover.tex" --purgeall --quiet --batchmode > /dev/null
+context "${3}cover.tex" --purgeall --quiet --silent --batchmode &> "../log/${3}cover.log"
 
-pdfunite "${3}cover.pdf" "${3}_preoriginal.pdf" "../${3}_originalfull.pdf"
+#pdfunite "${3}cover.pdf" "${3}_preoriginal.pdf" "../${3}_originalfull.pdf"
+cp "${3}_preoriginal.pdf" "../${3}_originalfull.pdf"
 pdfunite "${3}cover.pdf" "${3}_preOCR.pdf" "../${3}_OCR.pdf"
 
 
@@ -172,10 +306,11 @@ pdfunite "${3}cover.pdf" "${3}_preOCR.pdf" "../${3}_OCR.pdf"
 cd ..
 
 cat stage2/$3.md "stage2/${3}_ENG.txt" > "${3}_ENG.txt"
-
+#FIX
 rm -rf stage2
 
 echo "* ${3}"
 ls | sed -e 's/^/    * /'
+
 
 exit 0
