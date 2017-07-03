@@ -195,7 +195,7 @@ cat <<-HereDoc > "${3}.tex"
 \mainlanguage [en]
 ${geometry}
 \setuppapersize[sheet,${paper}][sheet,${paper}]
-
+\switchtobodyfont[modern,.05\pageheight]
 
 
 \setupexternalfigures[directory={${imageDir}}]
