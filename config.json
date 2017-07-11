@@ -1,1 +1,1 @@
-{"name":"Scan Exporter","version":100,"key":"dcffa996-01e0-11e6-a820-3c970e0cc7d6","interface":[{"type":"dropdown","label":"Rotation","items":["0","90","180","270"],"default":"90"}]}
+{"name":"Scan Exporter","version":101,"key":"dcffa996-01e0-11e6-a820-3c970e0cc7d6","interface":[{"type":"dropdown","label":"Rotation","items":["0","90","180","270"],"default":"90"}]}

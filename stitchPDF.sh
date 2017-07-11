@@ -54,7 +54,7 @@ else
 		180) 
 			scanOrient="upsidedown"
 			;;
-		240) 
+		270) 
 			scanOrient="right"
 			;;
 	esac
@@ -67,7 +67,7 @@ echo -n "Working with $numFiles images. "
 find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | xargs -0 -I{} identify {} | cut -d' ' -f3 | awk -F x -- '/[0-9]/ {print "\\definepapersize[sheet][width=" $1"px,height=" $2 "px]"}' | uniq > geometry
 
 geometry=$(cat geometry)
-echo -n "Geometry: $geometry."
+echo -n "Geometry: $geometry. ScanOrient: ${scanOrient}. "
 rm geometry
 
 #find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V 
