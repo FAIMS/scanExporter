@@ -320,7 +320,7 @@ cat stage2/$3.md "stage2/${3}_ENG.txt" > "${3}_ENG.txt"
 #FIX
 rm -rf stage2
 
-echo "* `${3}`"
+echo "* \`${3}\`"
 ls | sed -e 's/^/    * `/' | sed -e 's/$/`/'
 
 
