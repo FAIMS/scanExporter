@@ -27,16 +27,16 @@ cd pdf/$3
 
 
 
-echo "Finding Identifier $3"
+echo -n "    Finding Identifier \"$3\"."
 
 
 if [ -z "$4" ]; then
-	echo "no argument for orientation"
+	echo "*no argument for orientation*"
 	orientation=90
 	paper="landscape"
 	scanOrient="left"
 else
-	echo "$4"
+	echo -n "Orientation: $4. "
 	orientation=$4
 	if [ "$orientation" -eq "0" -o "$orientation" -eq "180" ]; then
 		paper="portrait"
@@ -75,13 +75,13 @@ find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' |
 
 
 
-echo "Scantailor"
+echo -n "Scantailor. "
 parallel --no-notice "scantailor-cli --orientation=${scanOrient} --despeckle=normal --normalize-illumination --color-mode=black_and_white --dewarping=auto {} ./ ; rm {}" ::: $(find . -name "*.pnm" | sort -V)
 rm -rf cache
 
 
 
-echo "tiff2pdf"
+echo -n "tiff2pdf. "
 parallel --no-notice "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unpaper+tiff2pdf+pdftk+imagemagick+tesseract+exactimage' {} ; rm {}" ::: $(find . -name "*.tif")
 
 
@@ -106,7 +106,10 @@ parallel --no-notice "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unp
 #	tiff2pdf -o "$name.pdf" -z -u m -p "A4" -F $name.tif	
 #	rm $file	
 #done
-echo "pdf14"
+echo -n "pdf14. "
+
+echo "File processing"
+
 pdf14=$(cat <<-'HereDoc'
 mv {} {.}.bak;
 pdftk {.}.bak dump_data > {.}.info;
@@ -119,6 +122,7 @@ convert {.}.png {.}.jpg;
 hocr2pdf -i {.}.jpg -s -o {.}.bk2 < {}.hocr 2> /dev/null;
 pdftk {.}.bk2 update_info {.}.info output {} 2< /dev/null;
 rm -f {.}.bak {.}.bk2 {.}.info {.}.png {.}.jpg {}.hocr;
+echo -n "."
 HereDoc
 )
 parallel "$pdf14" ::: $(find . -name "*.pdf") 
@@ -150,16 +154,16 @@ parallel "$pdf14" ::: $(find . -name "*.pdf")
 
 mkdir -p stage2
 
-echo "${3}_ENG.txt"
+echo "    Text: ${3}_ENG.txt"
 for file in $(find . -name "*.txt" | sort -g); do
     cat $file  >> "stage2/${3}_ENG.txt"
     rm $file
 done
 
-#echo "listing preocr files"
-#find .
+echo "listing preocr files"
+find .
 
-echo "${3}_preOCR.pdf"
+echo "    OCR: ${3}_OCR.pdf"
 
 
 pdfunite `find . -name "*.pdf"| sort -V` "stage2/${3}_preOCR.pdf"
@@ -184,7 +188,7 @@ mkdir jpg2pdf
 #tiff2pdf -p A4 -F -j -q 90 -f -o "stage2/${3}_preoriginal.pdf" jpg2pdf/multi.tiff 
 
 cd jpg2pdf
-echo "ConTeXt"
+echo "Making ConTeXt"
 
 
 imageDir=$(find ../../../ -name "$3" -type d ! -path "pdf" |tr '\n' ',')
