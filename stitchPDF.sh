@@ -27,7 +27,7 @@ cd pdf/$3
 
 
 
-echo -n "    Finding Identifier \"$3\"."
+echo -n "    Finding Identifier \"$3\". "
 
 
 if [ -z "$4" ]; then
@@ -60,10 +60,14 @@ else
 	esac
 fi	
 
+numFiles=$(find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" | wc -l)
+
+echo -n "Working with $numFiles images. "
+
 find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' -print0 | xargs -0 -I{} identify {} | cut -d' ' -f3 | awk -F x -- '/[0-9]/ {print "\\definepapersize[sheet][width=" $1"px,height=" $2 "px]"}' | uniq > geometry
 
 geometry=$(cat geometry)
-echo $geometry
+echo -n "Geometry: $geometry."
 rm geometry
 
 #find ../../ -name "$3" -type d | xargs -I{} find {} -name "*.jpg" ! -name '.*' | sort -V 
