@@ -112,7 +112,7 @@ parallel --no-notice "tiff2pdf -o '{.}.pdf' -z -u m -p 'A4' -F -c 'scanimage+unp
 #done
 echo -n "pdf14. "
 
-echo "File processing"
+echo -n "OCR File processing"
 
 pdf14=$(cat <<-'HereDoc'
 mv {} {.}.bak;
@@ -158,16 +158,17 @@ parallel "$pdf14" ::: $(find . -name "*.pdf")
 
 mkdir -p stage2
 
-echo "    Text: ${3}_ENG.txt"
+
+echo -e "\n    Writing Plain Text: ${3}_ENG.txt"
 for file in $(find . -name "*.txt" | sort -g); do
     cat $file  >> "stage2/${3}_ENG.txt"
     rm $file
 done
 
-echo "listing preocr files"
-find .
+#echo "listing preocr files"
+#find .
 
-echo "    OCR: ${3}_OCR.pdf"
+echo "    Writing OCR: ${3}_OCR.pdf"
 
 
 pdfunite `find . -name "*.pdf"| sort -V` "stage2/${3}_preOCR.pdf"
@@ -192,7 +193,7 @@ mkdir jpg2pdf
 #tiff2pdf -p A4 -F -j -q 90 -f -o "stage2/${3}_preoriginal.pdf" jpg2pdf/multi.tiff 
 
 cd jpg2pdf
-echo "Making ConTeXt"
+echo -n "    Making originals into PDF. "
 
 
 imageDir=$(find ../../../ -name "$3" -type d ! -path "pdf" |tr '\n' ',')
@@ -268,7 +269,7 @@ cp ../../$3.md stage2/
 cp ../../$3.info stage2/
 cd stage2
 
-echo "finishing"
+echo "Finishing. "
 
 echo "" >> $3.info
 
@@ -319,8 +320,8 @@ cat stage2/$3.md "stage2/${3}_ENG.txt" > "${3}_ENG.txt"
 #FIX
 rm -rf stage2
 
-echo "* ${3}"
-ls | sed -e 's/^/    * /'
+echo "* `${3}`"
+ls | sed -e 's/^/    * `/' | sed -e 's/$/`/'
 
 
 exit 0
