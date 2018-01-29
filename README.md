@@ -30,7 +30,7 @@ This exporter can be downloaded directly from this repository and used on FAIMS 
 * OCR version of the compiled photos, saved as .txt
 
 ## Exporter Use Recommendations:
-* Immediate field use with [FAIMS-Scanner](https://github.com/FAIMS/faims-scanner)
+* Immediate field use with [FAIMS Scanner](https://github.com/FAIMS/faims-scanner) or [Document Scanner](https://github.com/FAIMS/document-scanner)
 * Output Data format: Custom PDFs with attached metadata, .txt file
 
 ## Contact info:
